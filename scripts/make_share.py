@@ -9,6 +9,7 @@ make_share.py — 남에게 줄 수 있는 배포 폴더 + zip 을 만든다.
 결과: 다운로드/쿠팡카드뉴스_공유용/  +  쿠팡카드뉴스_공유용.zip
 """
 
+import json
 import shutil
 import sys
 import zipfile
@@ -80,18 +81,12 @@ def main():
 
     # 배포본이 자기 버전을 알아야 "업데이트 확인" 이 제대로 뜬다
     try:
-        import sys as _sys
-        _sys.path.insert(0, str(ROOT / "webapp"))
-        import update as _u
-        info = _u.remote_version()
+        sys.path.insert(0, str(ROOT / "webapp"))
+        import update as updater
+        info = updater.remote_version()
         (DEST / "version.json").write_text(
-            '{
-  "sha": "%s",
-  "message": %s,
-  "applied_at": "배포본"
-}
-'
-            % (info["sha"], __import__("json").dumps(info["message"], ensure_ascii=False)),
+            json.dumps({"sha": info["sha"], "message": info["message"],
+                        "applied_at": "배포본"}, ensure_ascii=False, indent=2),
             encoding="utf-8")
         print("버전 표시:", info["sha"][:7])
     except Exception as e:
