@@ -414,7 +414,7 @@ function show(d){
 ["onecard","beforecard"].forEach(id => {
   $("#" + id).addEventListener("click", e => {
     if(!e.target.src) return;
-    $("#lb-img").src = e.target.src; $("#lb").showModal();
+    $("#lbimg").src = e.target.src; $("#lb").showModal();
   });
 });
 
