@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: 1080px;
+    height: 1080px;
+    font-family: 'Noto Sans KR', sans-serif;
+    background: #f5f5f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .card {
+    width: 960px;
+    background: #ffffff;
+    border-radius: 24px;
+    padding: 64px 56px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  /* 별점 */
+  .stars {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .star {
+    width: 36px;
+    height: 36px;
+    display: inline-block;
+  }
+  .star.filled {
+    color: #e14d4d;
+  }
+  .star.empty {
+    color: #ddd;
+  }
+  .star svg {
+    width: 36px;
+    height: 36px;
+    fill: currentColor;
+  }
+  .rating-text {
+    font-size: 28px;
+    font-weight: 700;
+    color: #333;
+    margin-left: 8px;
+  }
+
+  /* 본문 */
+  .review-body {
+    font-size: 32px;
+    line-height: 1.65;
+    color: #222;
+    font-weight: 400;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+    /* 최대 7줄 */
+    display: -webkit-box;
+    -webkit-line-clamp: 7;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .review-body::before {
+    content: '\201C';
+    font-size: 48px;
+    font-weight: 700;
+    color: #e14d4d;
+    line-height: 1;
+    margin-right: 4px;
+  }
+
+  .review-body::after {
+    content: ' \201D';
+    font-size: 48px;
+    font-weight: 700;
+    color: #e14d4d;
+    line-height: 1;
+    margin-left: 4px;
+  }
+
+  /* 하단 메타 */
+  .meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid #eee;
+    padding-top: 28px;
+  }
+
+  .author-info {
+    font-size: 26px;
+    color: #888;
+    font-weight: 400;
+  }
+
+  .likes-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #fef2f2;
+    border-radius: 20px;
+    padding: 10px 20px;
+    font-size: 24px;
+    color: #e14d4d;
+    font-weight: 500;
+  }
+
+  .likes-badge .heart {
+    font-size: 22px;
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <!-- 별점 -->
+    <div class="stars">
+      {% for i in range(5) %}
+      <span class="star {% if i < rating_int %}filled{% else %}empty{% endif %}">
+        <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      </span>
+      {% endfor %}
+      <span class="rating-text">{{ rating }}/5</span>
+    </div>
+
+    <!-- 리뷰 본문 -->
+    <div class="review-body">{{ content }}</div>
+
+    <!-- 메타 정보 -->
+    <div class="meta">
+      <span class="author-info">{{ user }} · {{ date }}</span>
+      {% if likes > 0 %}
+      <span class="likes-badge">
+        <span class="heart">&#10084;</span>
+        {{ likes }}명에게 도움이 됐어요
+      </span>
+      {% endif %}
+    </div>
+  </div>
+</body>
+</html>

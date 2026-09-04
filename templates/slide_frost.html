@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ slide.headline }}</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+  <link rel="stylesheet" href="{{ css_path }}">
+  {% if design_css %}<style>{{ design_css }}</style>{% endif %}
+</head>
+<body class="pal-{{ palette }}">
+  {% macro rich(text) -%}
+    {%- for line in text.split('\n') -%}
+      {%- set parts = line.split('**') -%}
+      {%- for p in parts -%}
+        {%- if loop.index0 % 2 == 1 -%}<mark>{{ p }}</mark>{%- else -%}{{ p }}{%- endif -%}
+      {%- endfor -%}
+      {%- if not loop.last %}<br>{% endif -%}
+    {%- endfor -%}
+  {%- endmacro %}
+
+  {% macro chips(items) -%}
+    <div class="chips">
+      {% for c in items %}<span class="chip">{{ c }}</span>{% endfor %}
+    </div>
+  {%- endmacro %}
+
+  <div class="slide slide--{{ slide.type }}">
+
+    {# ── 표지 ── #}
+    {% if slide.type == "cover" %}
+      {% if slide.eyebrow %}<div class="tag">{{ slide.eyebrow }}</div>{% endif %}
+      <h1 class="mega mega--{{ slide.headline.split('\n')|select|list|length }}">{{ rich(slide.headline) }}</h1>
+      {% if slide.subhead %}<p class="mega-sub">{{ slide.subhead }}</p>{% endif %}
+      {% if slide.cutout %}
+        <img class="cutout" src="{{ slide.cutout }}" alt="">
+      {% elif slide.image_path %}
+        <div class="coverphoto" style="background-image:url('{{ slide.image_path }}');{% if slide.image_focus %}background-position:{{ slide.image_focus }};{% endif %}"></div>
+      {% endif %}
+      {% if slide.chips %}{{ chips(slide.chips) }}{% endif %}
+
+    {# ── 사진 ── #}
+    {% elif slide.type == "photo" and slide.image_path %}
+      <div class="bleed" style="background-image:url('{{ slide.image_path }}');{% if slide.image_focus %}background-position:{{ slide.image_focus }};{% endif %}"></div>
+      <div class="band">
+        {% if slide.eyebrow %}<div class="tag tag--band">{{ slide.eyebrow }}</div>{% endif %}
+        <h2>{{ rich(slide.headline) }}</h2>
+        {% if slide.subhead %}<p class="sub">{{ slide.subhead }}</p>{% endif %}
+      </div>
+      <div class="page page--onphoto">{{ slide.no }}/{{ total }}</div>
+
+    {# ── 스펙표 ── #}
+    {% elif slide.type == "spec" %}
+      <div class="pad">
+        <h2 class="sec">{{ rich(slide.headline) }}</h2>
+        <dl class="spec">
+          {% for row in slide.rows %}
+            <div><dt>{{ row.k }}</dt><dd>{{ row.v }}</dd></div>
+          {% endfor %}
+        </dl>
+        {% if slide.chips %}{{ chips(slide.chips) }}{% endif %}
+      </div>
+      <div class="page">{{ slide.no }}/{{ total }}</div>
+
+    {# ── 리뷰 카드 이미지 ── #}
+    {% elif slide.type == "review" %}
+      <div class="pad">
+        <h2 class="sec">{{ rich(slide.headline) }}</h2>
+        {% if slide.image_path %}<img class="review-img" src="{{ slide.image_path }}" alt="">{% endif %}
+      </div>
+      <div class="page">{{ slide.no }}/{{ total }}</div>
+
+    {# ── 리뷰 인용 ── #}
+    {% elif slide.type == "quotes" %}
+      <div class="pad">
+        {% if slide.headline %}<h2 class="sec">{{ rich(slide.headline) }}</h2>{% endif %}
+        <ul class="quotes quotes--{{ slide.quotes|length }}">
+          {% for q in slide.quotes %}
+            <li><p>{{ q.text }}</p>{% if q.who %}<span>{{ q.who }}</span>{% endif %}</li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div class="page">{{ slide.no }}/{{ total }}</div>
+
+    {# ── CTA ── #}
+    {% elif slide.type == "cta" %}
+      <div class="pad cta">
+        <h1>{{ rich(slide.headline) }}</h1>
+        {% if slide.chips %}{{ chips(slide.chips) }}{% endif %}
+      </div>
+      {% if slide.subhead %}<p class="disclosure">{{ slide.subhead }}</p>{% endif %}
+      <div class="page">{{ slide.no }}/{{ total }}</div>
+
+    {# ── 목록 / 그 외 ── #}
+    {% else %}
+      <div class="pad">
+        {% if slide.eyebrow %}<div class="tag tag--inline">{{ slide.eyebrow }}</div>{% endif %}
+        <h2 class="sec">{{ rich(slide.headline) }}</h2>
+        {% if slide.bullets %}
+          <ul class="list">
+            {% for b in slide.bullets %}<li>{{ b }}</li>{% endfor %}
+          </ul>
+        {% endif %}
+        {% if slide.subhead %}<p class="sub">{{ slide.subhead }}</p>{% endif %}
+        {% if slide.chips %}{{ chips(slide.chips) }}{% endif %}
+      </div>
+      <div class="page">{{ slide.no }}/{{ total }}</div>
+    {% endif %}
+
+    {% if label %}<div class="slide-label">{{ label }}</div>{% endif %}
+  </div>
+</body>
+</html>

@@ -1,0 +1,32 @@
+# ── 올리지 않을 것 ───────────────────────────────
+
+# 가상환경 (각자 컴퓨터에서 만든다)
+.venv/
+venv/
+
+# 파이썬 캐시
+__pycache__/
+*.pyc
+*.pyo
+
+# 크롤링 결과 — 내가 작업한 상품들. 용량도 크고 남에게 필요 없다
+output/
+
+# 개인 파일
+warmup/
+profile/
+threads.md
+preview.html
+
+# 크롬 프로필 (원래 홈 폴더에 생기지만 혹시 몰라서)
+.crawl-coupang-chrome/
+
+# 배포하면서 생기는 것
+*.zip
+
+# OS·편집기
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/

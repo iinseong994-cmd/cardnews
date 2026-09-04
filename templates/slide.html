@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ slide.headline }}</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+  <link rel="stylesheet" href="{{ css_path }}">
+</head>
+<body class="theme-{{ theme }}">
+
+  <div class="slide slide--{{ slide.type }}">
+
+    {# 배경 이미지 (있을 때만) #}
+    {% if slide.image_path %}
+      <div class="slide__bg-image" style="background-image: url('{{ slide.image_path }}');{% if slide.image_focus %} background-position: {{ slide.image_focus }};{% endif %}"></div>
+      <div class="slide__overlay"></div>
+    {% endif %}
+
+    {# 콘텐츠 영역 #}
+    <div class="slide__content">
+
+      {# 슬라이드 1: 후크 #}
+      {% if slide.type == "hook" %}
+        {% if slide.eyebrow %}
+          <div class="slide__eyebrow">{{ slide.eyebrow }}</div>
+        {% endif %}
+        <h1 class="slide__headline slide__headline--hook">{{ slide.headline }}</h1>
+        {% if slide.subhead %}
+          <p class="slide__subhead">{{ slide.subhead }}</p>
+        {% endif %}
+
+      {# 사진 전용: 이미지가 주인공, 하단에 짧은 캡션 #}
+      {% elif slide.type == "photo" %}
+        <div class="slide__photo-caption">
+          {% if slide.eyebrow %}
+            <div class="slide__eyebrow">{{ slide.eyebrow }}</div>
+          {% endif %}
+          {% if slide.headline %}
+            <div class="slide__photo-headline">{{ slide.headline }}</div>
+          {% endif %}
+        </div>
+
+      {# 리뷰 카드: review_card PNG가 주인공, 상단 라벨만 #}
+      {% elif slide.type == "review" %}
+        {% if slide.eyebrow %}
+          <div class="slide__eyebrow slide__eyebrow--review">{{ slide.eyebrow }}</div>
+        {% endif %}
+
+      {# 마지막 슬라이드: CTA #}
+      {% elif slide.type == "cta" %}
+        <h1 class="slide__headline slide__headline--cta">{{ slide.headline }}</h1>
+        {% if slide.subhead %}
+          <p class="slide__subhead slide__subhead--cta">{{ slide.subhead }}</p>
+        {% endif %}
+        <div class="slide__cta-action">
+          <span class="slide__cta-arrow">↗</span>
+          <span class="slide__cta-text">DM으로 공유하기</span>
+        </div>
+
+      {# 본문 / 공감 / 반전 / 요약 #}
+      {% else %}
+        <div class="slide__text">
+          {% if slide.eyebrow %}
+            <div class="slide__eyebrow">{{ slide.eyebrow }}</div>
+          {% endif %}
+          <h2 class="slide__headline">{{ slide.headline }}</h2>
+          {% if slide.subhead %}
+            <p class="slide__subhead">{{ slide.subhead }}</p>
+          {% endif %}
+          {% if slide.bullets %}
+            <ul class="slide__bullets">
+              {% for bullet in slide.bullets %}
+                <li>{{ bullet }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+      {% endif %}
+
+    </div>
+
+    {# 푸터: 번호 + 브랜드 #}
+    <div class="slide__footer">
+      <div class="slide__number">{{ slide.no }} / {{ total }}</div>
+      {% if brand %}
+        <div class="slide__brand">{{ brand }}</div>
+      {% endif %}
+      {% if slide.type != "cta" and slide.no < total %}
+        <div class="slide__next-hint">다음 →</div>
+      {% endif %}
+    </div>
+
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ slide.headline }}</title>
+  <link rel="stylesheet" href="{{ css_path }}">
+</head>
+<body>
+  <div class="slide slide--{{ slide.type }}">
+
+    {% if slide.type == "photo" and slide.image_path %}
+      <div class="photo-area" style="background-image:url('{{ slide.image_path }}');{% if slide.image_focus %}background-position:{{ slide.image_focus }};{% endif %}"></div>
+      <div class="photo-band">
+        {% if slide.eyebrow %}<div class="overline">{{ slide.eyebrow }}</div>{% endif %}
+        {% if slide.headline %}
+          <h1 class="serif photo-headline">{% for line in slide.headline.split('\n') %}{{ line }}{% if not loop.last %}<br>{% endif %}{% endfor %}</h1>
+        {% endif %}
+      </div>
+      <div class="pagenum pagenum--photo">{{ "%02d"|format(slide.no) }}</div>
+
+    {% elif slide.type == "review" %}
+      <div class="frame"></div>
+      {% if slide.eyebrow %}<div class="overline overline--top">{{ slide.eyebrow }}</div>{% endif %}
+      <div class="review-wrap">
+        <div class="tape"></div>
+        {% if slide.image_path %}<img class="review-img" src="{{ slide.image_path }}">{% endif %}
+      </div>
+      {% if slide.subhead %}<p class="review-cap">{{ slide.subhead }}</p>{% endif %}
+      <div class="pagenum">{{ "%02d"|format(slide.no) }}</div>
+
+    {% else %}
+      <div class="frame"></div>
+      {% if brand %}<div class="brand">{{ brand }}</div>{% endif %}
+
+      {% if slide.type == "hook" %}
+        <div class="center-block">
+          {% if slide.eyebrow %}<div class="overline">{{ slide.eyebrow }}</div>{% endif %}
+          <h1 class="serif hook-headline">{% for line in slide.headline.split('\n') %}{{ line }}{% if not loop.last %}<br>{% endif %}{% endfor %}</h1>
+          <div class="divider"></div>
+          {% if slide.subhead %}<p class="subhead">{{ slide.subhead }}</p>{% endif %}
+        </div>
+
+      {% elif slide.type == "empathy" %}
+        <div class="center-block">
+          <div class="quote-mark serif">“</div>
+          <h1 class="serif empathy-headline">{% for line in slide.headline.split('\n') %}{{ line }}{% if not loop.last %}<br>{% endif %}{% endfor %}</h1>
+          {% if slide.subhead %}<p class="subhead">{{ slide.subhead }}</p>{% endif %}
+          {% if slide.eyebrow %}<div class="overline overline--below">{{ slide.eyebrow }}</div>{% endif %}
+        </div>
+
+      {% elif slide.type == "cta" %}
+        <div class="center-block">
+          {% if slide.eyebrow %}<div class="overline">{{ slide.eyebrow }}</div>{% endif %}
+          <h1 class="serif cta-headline">{% for line in slide.headline.split('\n') %}{{ line }}{% if not loop.last %}<br>{% endif %}{% endfor %}</h1>
+          <div class="divider"></div>
+          {% if slide.subhead %}<p class="disclosure">{{ slide.subhead }}</p>{% endif %}
+        </div>
+
+      {% else %}
+        <div class="body-block">
+          {% if slide.eyebrow %}<div class="overline overline--left">{{ slide.eyebrow }}</div>{% endif %}
+          <h1 class="serif body-headline">{% for line in slide.headline.split('\n') %}{{ line }}{% if not loop.last %}<br>{% endif %}{% endfor %}</h1>
+          {% if slide.subhead %}<p class="body-sub">{{ slide.subhead }}</p>{% endif %}
+          {% if slide.bullets %}
+          <ul class="spec-list">
+            {% for b in slide.bullets %}
+            <li><span class="serif num">{{ "%02d"|format(loop.index) }}</span><span class="txt">{{ b }}</span></li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      <div class="pagenum">{{ "%02d"|format(slide.no) }} <i>/ {{ "%02d"|format(total) }}</i></div>
+    {% endif %}
+
+  </div>
+</body>
+</html>

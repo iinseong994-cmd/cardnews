@@ -1,0 +1,433 @@
+/* ============================================================
+   카드뉴스 디자인 시스템
+   - 캔버스: 1080 × 1350 (4:5)
+   - 폰트: Pretendard
+   - 색상: 테마별 CSS 변수
+   ============================================================ */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 1080px;
+  height: 1350px;
+  margin: 0;
+  padding: 0;
+  font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* ============================================================
+   THEME VARIABLES
+   ============================================================ */
+
+/* default: 네이비 + 라임 */
+.theme-default {
+  --bg: #1A1F2E;
+  --bg-alt: #232938;
+  --accent: #C8FF00;
+  --accent-text: #1A1F2E;
+  --text: #FFFFFF;
+  --text-mute: #8A92A6;
+}
+
+/* warm: 베이지 + 다크브라운 */
+.theme-warm {
+  --bg: #F5EFE6;
+  --bg-alt: #E8DDD0;
+  --accent: #B8472A;
+  --accent-text: #F5EFE6;
+  --text: #2D1810;
+  --text-mute: #6B5D52;
+}
+
+/* mono: 블랙 화이트 */
+.theme-mono {
+  --bg: #FFFFFF;
+  --bg-alt: #F2F2F2;
+  --accent: #000000;
+  --accent-text: #FFFFFF;
+  --text: #000000;
+  --text-mute: #6B6B6B;
+}
+
+/* ============================================================
+   SLIDE BASE
+   ============================================================ */
+
+.slide {
+  position: relative;
+  width: 1080px;
+  height: 1350px;
+  background: var(--bg);
+  color: var(--text);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.slide__bg-image {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  z-index: 0;
+}
+
+.slide__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg,
+    rgba(0, 0, 0, 0.55) 0%,
+    rgba(0, 0, 0, 0.35) 50%,
+    rgba(0, 0, 0, 0.92) 100%);
+  z-index: 1;
+}
+
+.slide__content {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  padding: 100px 80px 0 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* ============================================================
+   TYPOGRAPHY
+   ============================================================ */
+
+.slide__eyebrow {
+  font-size: 32px;
+  font-weight: 600;
+  color: var(--accent);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 32px;
+}
+
+.slide__headline {
+  font-size: 84px;
+  font-weight: 800;
+  line-height: 1.18;
+  letter-spacing: -0.035em;
+  color: var(--text);
+  word-break: keep-all;
+  margin-bottom: 36px;
+}
+
+.slide__headline--hook {
+  font-size: 110px;
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+}
+
+.slide__headline--cta {
+  font-size: 96px;
+  font-weight: 900;
+  color: var(--accent-text);
+  text-align: center;
+  line-height: 1.15;
+}
+
+.slide__subhead {
+  font-size: 38px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--text-mute);
+  word-break: keep-all;
+  letter-spacing: -0.01em;
+}
+
+.slide__subhead--cta {
+  color: var(--accent-text);
+  opacity: 0.85;
+  text-align: center;
+  margin-top: 16px;
+}
+
+.slide__bullets {
+  list-style: none;
+  margin-top: 32px;
+}
+
+.slide__bullets li {
+  font-size: 42px;
+  font-weight: 600;
+  line-height: 1.55;
+  color: var(--text);
+  padding: 18px 0 18px 56px;
+  position: relative;
+  word-break: keep-all;
+}
+
+.slide__bullets li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 36px;
+  width: 36px;
+  height: 6px;
+  background: var(--accent);
+  border-radius: 3px;
+}
+
+/* ============================================================
+   TEXT BOX (body / empathy / twist / summary)
+   - 이미지 위 텍스트 가독성 보장용 어두운 박스
+   ============================================================ */
+
+.slide__text {
+  position: relative;
+  align-self: flex-start;
+  max-width: 100%;
+  background: rgba(0, 0, 0, 0.75);
+  padding: 40px 48px 44px 48px;
+  border-radius: 8px;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border-left: 6px solid var(--accent);
+}
+
+.slide__text .slide__eyebrow {
+  margin-bottom: 24px;
+}
+
+.slide__text .slide__headline {
+  margin-bottom: 24px;
+}
+
+.slide__text .slide__subhead {
+  color: rgba(255, 255, 255, 0.92);
+}
+
+/* ============================================================
+   SLIDE TYPE VARIANTS
+   ============================================================ */
+
+/* HOOK: 강조색 강한 배경 */
+.slide--hook {
+  background: var(--bg);
+}
+
+.slide--hook .slide__content {
+  justify-content: flex-end;
+  padding-bottom: 200px;
+}
+
+.slide--hook .slide__eyebrow {
+  color: var(--accent);
+}
+
+/* EMPATHY: 부드러운 톤 */
+.slide--empathy .slide__headline {
+  font-size: 72px;
+}
+
+/* BODY: 일관된 본문 레이아웃 */
+.slide--body .slide__content {
+  justify-content: flex-start;
+  padding-top: 180px;
+}
+
+/* TWIST: 다시 후킹 */
+.slide--twist {
+  background: var(--bg-alt);
+}
+
+.slide--twist .slide__eyebrow {
+  color: var(--accent);
+}
+
+/* SUMMARY: 리스트 가독성 */
+.slide--summary .slide__content {
+  justify-content: flex-start;
+  padding-top: 160px;
+}
+
+.slide--summary .slide__headline {
+  font-size: 64px;
+  margin-bottom: 24px;
+}
+
+/* PHOTO: 이미지가 주인공. 하단에 짧은 캡션 박스 */
+.slide--photo {
+  background: var(--bg);
+}
+
+.slide--photo .slide__bg-image {
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.slide--photo .slide__overlay {
+  display: none;
+}
+
+.slide--photo .slide__content {
+  justify-content: flex-end;
+  padding: 0 80px 140px 80px;
+}
+
+.slide__photo-caption {
+  align-self: flex-start;
+  background: rgba(0, 0, 0, 0.82);
+  padding: 28px 40px 32px 40px;
+  border-radius: 6px;
+  border-left: 6px solid var(--accent);
+  max-width: 100%;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.slide__photo-caption .slide__eyebrow {
+  font-size: 26px;
+  margin-bottom: 14px;
+}
+
+.slide__photo-headline {
+  font-size: 52px;
+  font-weight: 800;
+  line-height: 1.22;
+  letter-spacing: -0.025em;
+  color: var(--text);
+  word-break: keep-all;
+}
+
+/* REVIEW: review_card PNG가 주인공, 상단에 라벨만 */
+.slide--review {
+  background: var(--bg);
+}
+
+.slide--review .slide__bg-image {
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center 58%;
+}
+
+.slide--review .slide__overlay {
+  display: none;
+}
+
+.slide--review .slide__content {
+  justify-content: flex-start;
+  padding: 80px 80px 0 80px;
+  align-items: center;
+}
+
+.slide__eyebrow--review {
+  color: var(--accent);
+  font-size: 34px;
+  text-align: center;
+  letter-spacing: 0.08em;
+  margin-bottom: 0;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* CTA: 강조색 풀배경 (이미지 무시 — 라임 정체성 유지) */
+.slide--cta {
+  background: var(--accent);
+}
+
+.slide--cta .slide__bg-image,
+.slide--cta .slide__overlay {
+  display: none;
+}
+
+.slide--cta .slide__content {
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.slide__cta-action {
+  margin-top: 80px;
+  padding: 40px 64px;
+  background: var(--accent-text);
+  color: var(--accent);
+  border-radius: 80px;
+  font-size: 48px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.slide__cta-arrow {
+  font-size: 56px;
+}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+
+.slide__footer {
+  position: relative;
+  z-index: 2;
+  padding: 32px 80px 64px 80px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.01em;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.85), 0 0 16px rgba(0, 0, 0, 0.65);
+}
+
+.slide__footer::before {
+  content: '';
+  position: absolute;
+  inset: -40px 0 0 0;
+  background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.85) 60%);
+  z-index: -1;
+  pointer-events: none;
+}
+
+.slide__number {
+  font-variant-numeric: tabular-nums;
+}
+
+.slide__brand {
+  text-align: center;
+  flex: 1;
+}
+
+.slide__next-hint {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.slide--cta .slide__footer {
+  color: var(--accent-text);
+  opacity: 0.7;
+  text-shadow: none;
+}
+
+.slide--cta .slide__footer::before {
+  display: none;
+}
+
+.slide--cta .slide__next-hint {
+  display: none;
+}
+
+/* HOOK 슬라이드: 텍스트 박스 없이 text-shadow로 가독성 보강 */
+.slide--hook .slide__eyebrow {
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.85);
+}
+
+.slide--hook .slide__headline {
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.78), 0 0 36px rgba(0, 0, 0, 0.45);
+}
+
+.slide--hook .slide__subhead {
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.85);
+}

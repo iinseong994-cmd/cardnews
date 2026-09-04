@@ -1,0 +1,199 @@
+/* ── 프로스트 테마 — 1080×1350, 얼음빛 바탕 + 라벨 알약 + 큰 타이포 ── */
+
+:root {
+  --ink:     #10344F;   /* 본문 진한 남색 */
+  --ink-2:   #4A7290;   /* 보조 */
+  --line:    #C9DFEF;
+  --chip-bg: #FFFFFF;
+  --chip-ink:#1B5E8C;
+  --accent:  #1E86D0;   /* 아이스 블루 */
+  --accent-2:#7FC7F2;
+}
+
+/* 팔레트: sage — 세이지 그린 (천연·주방·식물성 상품) */
+body.pal-sage {
+  --ink:     #223020;
+  --ink-2:   #5B6E52;
+  --line:    #D6E3CB;
+  --chip-bg: #FFFFFF;
+  --chip-ink:#4A6B39;
+  --accent:  #5E9440;
+  --accent-2:#A8CB88;
+}
+body.pal-sage .slide {
+  background:
+    radial-gradient(900px 620px at 78% 12%, rgba(255,255,255,.95), rgba(255,255,255,0) 70%),
+    linear-gradient(178deg, #E3EEDA 0%, #F1F7EC 44%, #FCFDFA 100%);
+}
+body.pal-sage .slide--cover .mega {
+  background: linear-gradient(180deg, #83B562 0%, #3F6B2C 100%);
+  -webkit-background-clip: text; background-clip: text;
+}
+body.pal-sage .band { border-top-color: var(--line); }
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  width: 1080px; height: 1350px; overflow: hidden;
+  font-family: 'Pretendard Variable', Pretendard, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  word-break: keep-all;
+}
+
+.slide {
+  position: relative; width: 1080px; height: 1350px; overflow: hidden;
+  background:
+    radial-gradient(900px 620px at 78% 12%, rgba(255,255,255,.95), rgba(255,255,255,0) 70%),
+    linear-gradient(178deg, #D7EAF8 0%, #E9F4FC 44%, #FBFDFF 100%);
+}
+
+mark { background: none; color: var(--accent); }
+
+.page {
+  position: absolute; bottom: 46px; left: 0; right: 0;
+  text-align: center; font-size: 22px; font-weight: 600; color: #8FAAC0;
+}
+.page--onphoto { color: #A9BECE; }
+
+/* ── 알약 라벨 ── */
+.tag {
+  position: absolute; top: 96px; left: 84px;
+  display: inline-block;
+  padding: 15px 30px;
+  background: var(--chip-bg);
+  color: var(--chip-ink);
+  border: 2px solid var(--line);
+  border-radius: 999px;
+  font-size: 30px; font-weight: 700;
+  box-shadow: 0 6px 18px rgba(16,52,79,.08);
+}
+.tag--inline, .tag--band { position: static; margin-bottom: 26px; }
+.tag--band { padding: 10px 22px; font-size: 24px; box-shadow: none; }
+
+/* ── 알약 뱃지 줄 ── */
+.chips { display: flex; flex-wrap: wrap; gap: 16px; }
+.chip {
+  padding: 15px 28px;
+  background: var(--chip-bg);
+  color: var(--chip-ink);
+  border: 2px solid var(--line);
+  border-radius: 999px;
+  font-size: 30px; font-weight: 700;
+  box-shadow: 0 6px 18px rgba(16,52,79,.07);
+}
+
+/* ── 표지 ── */
+.slide--cover .mega {
+  position: absolute; left: 84px; top: 196px; width: 500px;
+  font-size: 152px; font-weight: 900; line-height: 1.02;
+  letter-spacing: -.045em;
+  background: linear-gradient(180deg, #4FA9E4 0%, #1567A8 100%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 6px 0 rgba(255,255,255,.92)) drop-shadow(0 14px 26px rgba(16,52,79,.18));
+}
+/* 줄이 늘어나면 글자를 줄여 아래 설명과 겹치지 않게 */
+.slide--cover .mega--3 { font-size: 102px; }
+.slide--cover .mega--4 { font-size: 78px; }
+
+.slide--cover .mega mark {
+  -webkit-text-fill-color: initial; color: var(--ink);
+  background: none;
+}
+.slide--cover .mega-sub {
+  position: absolute; left: 88px; top: 574px; width: 470px;
+  font-size: 31px; font-weight: 600; color: var(--ink-2); line-height: 1.55;
+}
+.slide--cover .cutout {
+  position: absolute; right: -50px; top: 296px;
+  height: 624px; width: auto;
+  filter: drop-shadow(0 26px 46px rgba(16,52,79,.26));
+}
+.slide--cover .coverphoto {
+  position: absolute; right: 0; top: 196px;
+  width: 470px; height: 768px;
+  border-radius: 26px 0 0 26px;
+  background-size: cover; background-position: center;
+  box-shadow: 0 22px 44px rgba(16,52,79,.20);
+}
+
+.slide--cover .chips {
+  position: absolute; left: 84px; right: 84px; bottom: 128px;
+}
+
+/* ── 사진 ── */
+.bleed {
+  position: absolute; top: 0; left: 0; width: 1080px; height: 1050px;
+  background-size: cover; background-position: center;
+}
+.band {
+  position: absolute; top: 1050px; left: 0; width: 1080px; height: 300px;
+  background: #FFFFFF;
+  padding: 40px 76px 0;
+  border-top: 3px solid var(--line);
+}
+.band h2 { font-size: 50px; font-weight: 800; line-height: 1.26; letter-spacing: -.025em; }
+.band .sub { margin-top: 12px; font-size: 26px; font-weight: 500; color: var(--ink-2); }
+.page--onphoto { bottom: 30px; }
+
+/* ── 공통 본문 블록 ── */
+.pad {
+  position: absolute; left: 84px; right: 84px;
+  top: 50%; transform: translateY(-50%);
+}
+.sec {
+  font-size: 68px; font-weight: 900; line-height: 1.24;
+  letter-spacing: -.035em; margin-bottom: 48px;
+}
+
+/* ── 스펙표 ── */
+.spec { display: flex; flex-direction: column; margin-bottom: 44px; }
+.spec > div {
+  display: flex; align-items: baseline; gap: 28px;
+  padding: 26px 4px; border-bottom: 2px solid var(--line);
+}
+.spec > div:first-child { border-top: 2px solid var(--line); }
+.spec dt { width: 210px; flex: none; font-size: 30px; font-weight: 700; color: var(--ink-2); }
+.spec dd { font-size: 36px; font-weight: 700; }
+
+/* ── 목록 ── */
+.list { list-style: none; display: flex; flex-direction: column; gap: 6px; margin-bottom: 40px; }
+.list li {
+  position: relative; padding: 22px 0 22px 50px;
+  font-size: 38px; font-weight: 600; line-height: 1.45;
+}
+.list li::before {
+  content: ""; position: absolute; left: 4px; top: 36px;
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--accent-2); border: 5px solid #fff;
+  box-shadow: 0 0 0 2px var(--accent-2);
+}
+.pad .sub { font-size: 28px; font-weight: 500; color: var(--ink-2); line-height: 1.6; margin-bottom: 36px; }
+
+/* ── 리뷰 카드 이미지 ── */
+.review-img {
+  display: block; width: 100%;
+  border-radius: 22px; border: 2px solid var(--line);
+  box-shadow: 0 12px 30px rgba(16,52,79,.10);
+}
+
+/* ── 리뷰 인용 ── */
+.quotes { list-style: none; display: flex; flex-direction: column; gap: 34px; }
+.quotes li {
+  background: #fff; border: 2px solid var(--line); border-radius: 22px;
+  padding: 30px 34px; box-shadow: 0 8px 22px rgba(16,52,79,.06);
+}
+.quotes li p { font-size: 33px; font-weight: 600; line-height: 1.48; }
+.quotes li span { display: block; margin-top: 14px; font-size: 24px; font-weight: 500; color: var(--ink-2); }
+.quotes--1 li p { font-size: 46px; line-height: 1.45; }
+
+/* ── CTA ── */
+.cta { text-align: center; top: 45%; }
+.cta h1 { font-size: 84px; font-weight: 900; line-height: 1.34; letter-spacing: -.035em; }
+.cta .chips { justify-content: center; margin-top: 52px; }
+.disclosure {
+  position: absolute; bottom: 108px; left: 110px; right: 110px;
+  text-align: center; font-size: 21px; font-weight: 500;
+  color: #7C97AD; line-height: 1.7;
+}

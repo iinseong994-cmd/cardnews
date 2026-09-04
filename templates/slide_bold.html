@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ slide.headline }}</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+  <link rel="stylesheet" href="{{ css_path }}">
+  {% if design_css %}<style>{{ design_css }}</style>{% endif %}
+</head>
+<body>
+  {% macro rich(text) -%}
+    {%- for line in text.split('\n') -%}
+      {%- set parts = line.split('**') -%}
+      {%- for p in parts -%}
+        {%- if loop.index0 % 2 == 1 -%}<mark>{{ p }}</mark>{%- else -%}{{ p }}{%- endif -%}
+      {%- endfor -%}
+      {%- if not loop.last %}<br>{% endif -%}
+    {%- endfor -%}
+  {%- endmacro %}
+
+  <div class="slide slide--{{ slide.type }}">
+
+    {% if slide.type == "photo" and slide.image_path %}
+      <div class="bleed" style="background-image:url('{{ slide.image_path }}');{% if slide.image_focus %}background-position:{{ slide.image_focus }};{% endif %}"></div>
+      <div class="band">
+        <h2>{{ rich(slide.headline) }}</h2>
+        {% if slide.subhead %}<p class="sub">{{ slide.subhead }}</p>{% endif %}
+        <div class="page">{{ slide.no }}/{{ total }}</div>
+      </div>
+
+    {% elif slide.type == "quotes" %}
+      <div class="pad quotes quotes--{{ slide.quotes|length }}">
+        {% if slide.headline %}<h2>{{ rich(slide.headline) }}</h2>{% endif %}
+        <ul>
+          {% for q in slide.quotes %}
+            <li>
+              <p>{{ q.text }}</p>
+              {% if q.who %}<span>{{ q.who }}</span>{% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div class="page page--float">{{ slide.no }}/{{ total }}</div>
+
+    {% elif slide.type == "cta" %}
+      <div class="pad cta">
+        <h1>{{ rich(slide.headline) }}</h1>
+      </div>
+      {% if slide.subhead %}<p class="disclosure">{{ slide.subhead }}</p>{% endif %}
+      <div class="page page--float">{{ slide.no }}/{{ total }}</div>
+
+    {% elif slide.type == "body" %}
+      <div class="pad body">
+        <h2>{{ rich(slide.headline) }}</h2>
+        {% if slide.bullets %}
+          <ul>
+            {% for b in slide.bullets %}<li>{{ b }}</li>{% endfor %}
+          </ul>
+        {% endif %}
+      </div>
+      <div class="page page--float">{{ slide.no }}/{{ total }}</div>
+
+    {% else %}
+      {# hook / empathy — 화면 전체를 쓰는 텍스트 #}
+      <div class="pad statement">
+        <h1>{{ rich(slide.headline) }}</h1>
+        {% if slide.subhead %}<p class="sub">{{ slide.subhead }}</p>{% endif %}
+      </div>
+      <div class="page page--float">{{ slide.no }}/{{ total }}</div>
+    {% endif %}
+
+    {% if label %}<div class="slide-label">{{ label }}</div>{% endif %}
+  </div>
+</body>
+</html>

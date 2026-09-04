@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ slide.headline }}</title>
+  <link rel="stylesheet" href="{{ css_path }}">
+  {% if design_css %}<style>{{ design_css }}</style>{% endif %}
+</head>
+<body>
+  {% macro rich(text) -%}
+    {%- for line in text.split('\n') -%}
+      {%- set parts = line.split('**') -%}
+      {%- for p in parts -%}
+        {%- if loop.index0 % 2 == 1 -%}<mark>{{ p }}</mark>{%- else -%}{{ p }}{%- endif -%}
+      {%- endfor -%}
+      {%- if not loop.last %}<br>{% endif -%}
+    {%- endfor -%}
+  {%- endmacro %}
+
+  <div class="slide slide--{{ slide.type }}">
+
+    {% if slide.type == "hook" %}
+      <div class="hook-box">
+        <h1>{{ rich(slide.headline) }}</h1>
+        {% if slide.subhead %}<p class="sub">{{ slide.subhead }}</p>{% endif %}
+      </div>
+
+    {% elif slide.type == "photo" and slide.image_path %}
+      <div class="photo-card" style="background-image:url('{{ slide.image_path }}');{% if slide.image_focus %}background-position:{{ slide.image_focus }};{% endif %}"></div>
+      <div class="photo-caption">
+        <h2>{{ rich(slide.headline) }}</h2>
+        {% if slide.subhead %}<p class="sub">{{ slide.subhead }}</p>{% endif %}
+      </div>
+
+    {% elif slide.type == "review" %}
+      <h2 class="review-title">{{ rich(slide.headline) }}</h2>
+      {% if slide.image_path %}<img class="review-img" src="{{ slide.image_path }}">{% endif %}
+
+    {% elif slide.type == "quotes" %}
+      <div class="quotes-box quotes-box--{{ slide.quotes|length }}">
+        {% if slide.headline %}<h2>{{ rich(slide.headline) }}</h2>{% endif %}
+        <ul>
+          {% for q in slide.quotes %}
+            <li>
+              <p>{{ q.text }}</p>
+              {% if q.who %}<span>{{ q.who }}</span>{% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+
+    {% elif slide.type == "cta" %}
+      <div class="cta-box">
+        <h1>{{ rich(slide.headline) }}</h1>
+      </div>
+      {% if slide.subhead %}<p class="disclosure">{{ slide.subhead }}</p>{% endif %}
+
+    {% elif slide.type == "empathy" %}
+      <div class="hook-box">
+        <h1>{{ rich(slide.headline) }}</h1>
+        {% if slide.subhead %}<p class="sub">{{ slide.subhead }}</p>{% endif %}
+      </div>
+
+    {% else %}
+      <div class="body-box">
+        <h2>{{ rich(slide.headline) }}</h2>
+        {% if slide.bullets %}
+        <ul>
+          {% for b in slide.bullets %}<li>{{ b }}</li>{% endfor %}
+        </ul>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="page">{{ slide.no }}/{{ total }}</div>
+    {% if label %}<div class="slide-label">{{ label }}</div>{% endif %}
+  </div>
+</body>
+</html>

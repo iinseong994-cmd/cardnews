@@ -1,0 +1,237 @@
+/* ── 매거진(에디토리얼) 테마 — 1080×1350 ─────────────────── */
+
+@font-face {
+  font-family: 'Gowun Batang';
+  src: url('fonts/GowunBatang-Regular.ttf') format('truetype');
+  font-weight: 400;
+}
+@font-face {
+  font-family: 'Gowun Batang';
+  src: url('fonts/GowunBatang-Bold.ttf') format('truetype');
+  font-weight: 700;
+}
+
+:root {
+  --paper: #F7F3EC;
+  --ink: #262117;
+  --muted: #8D8271;
+  --hair: rgba(38, 33, 23, 0.22);
+  --accent: #C4704F;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  width: 1080px;
+  height: 1350px;
+  overflow: hidden;
+  font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+  color: var(--ink);
+  background: var(--paper);
+}
+
+.serif { font-family: 'Gowun Batang', 'AppleMyungjo', serif; }
+
+.slide {
+  position: relative;
+  width: 1080px;
+  height: 1350px;
+  background: var(--paper);
+}
+
+/* 공통 장식 */
+.frame {
+  position: absolute;
+  inset: 34px;
+  border: 1.5px solid var(--hair);
+  pointer-events: none;
+}
+.brand {
+  position: absolute;
+  top: 64px; left: 0; right: 0;
+  text-align: center;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 0.34em;
+  text-indent: 0.34em;
+  color: var(--muted);
+}
+.overline {
+  font-size: 21px;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  text-indent: 0.3em;
+  color: var(--accent);
+  text-align: center;
+  margin-bottom: 34px;
+}
+.overline--top { position: absolute; top: 92px; left: 0; right: 0; }
+.overline--below { margin-top: 44px; margin-bottom: 0; }
+.overline--left { text-align: left; text-indent: 0; margin-bottom: 26px; }
+.divider {
+  width: 56px; height: 1.5px;
+  background: var(--ink);
+  opacity: 0.65;
+  margin: 44px auto;
+}
+.pagenum {
+  position: absolute;
+  bottom: 58px; left: 0; right: 0;
+  text-align: center;
+  font-size: 20px;
+  letter-spacing: 0.18em;
+  color: var(--muted);
+  font-weight: 500;
+}
+.pagenum i { font-style: normal; opacity: 0.55; }
+.pagenum--photo {
+  left: auto; right: 44px; bottom: auto; top: 44px;
+  color: rgba(255, 255, 255, 0.85);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.35);
+  text-align: right;
+}
+
+/* ── hook (표지) ── */
+.center-block {
+  position: absolute;
+  left: 100px; right: 100px;
+  top: 50%;
+  transform: translateY(-50%);
+  text-align: center;
+  word-break: keep-all;
+}
+.hook-headline {
+  font-size: 92px;
+  font-weight: 700;
+  line-height: 1.42;
+  letter-spacing: -0.01em;
+}
+.subhead {
+  font-size: 30px;
+  font-weight: 500;
+  line-height: 1.7;
+  color: var(--muted);
+}
+
+/* ── photo ── */
+.photo-area {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1020px;
+  background-size: cover;
+  background-position: center top;
+}
+.photo-band {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 330px;
+  background: var(--paper);
+  padding: 64px 88px 0;
+  word-break: keep-all;
+}
+.photo-band .overline { text-align: left; text-indent: 0; margin-bottom: 24px; }
+.photo-headline {
+  font-size: 58px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+/* ── empathy (인용) ── */
+.quote-mark {
+  font-size: 130px;
+  line-height: 0.6;
+  color: var(--accent);
+  margin-bottom: 18px;
+}
+.empathy-headline {
+  font-size: 72px;
+  font-weight: 700;
+  line-height: 1.52;
+}
+.empathy-headline + .subhead { margin-top: 40px; }
+
+/* ── body (스펙 리스트) ── */
+.body-block {
+  position: absolute;
+  left: 110px; right: 110px;
+  top: 50%;
+  transform: translateY(-50%);
+  word-break: keep-all;
+}
+.body-headline {
+  font-size: 62px;
+  font-weight: 700;
+  line-height: 1.4;
+  margin-bottom: 14px;
+}
+.body-sub {
+  font-size: 27px;
+  color: var(--muted);
+  font-weight: 500;
+  margin-bottom: 46px;
+}
+.spec-list { list-style: none; }
+.spec-list li {
+  display: flex;
+  align-items: baseline;
+  gap: 34px;
+  padding: 34px 6px;
+  border-top: 1px solid var(--hair);
+  font-size: 31px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+.spec-list li:last-child { border-bottom: 1px solid var(--hair); }
+.spec-list .num {
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+/* ── review (폴라로이드) ── */
+.review-wrap {
+  position: absolute;
+  left: 0; right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  text-align: center;
+}
+.review-img {
+  width: 760px;
+  transform: rotate(-1.6deg);
+  border: 14px solid #FFFFFF;
+  box-shadow: 0 24px 60px rgba(38, 33, 23, 0.18);
+}
+.tape {
+  position: absolute;
+  top: -34px; left: 50%;
+  transform: translateX(-50%) rotate(2deg);
+  width: 190px; height: 56px;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(38, 33, 23, 0.08);
+  z-index: 2;
+}
+.review-cap {
+  position: absolute;
+  bottom: 108px; left: 0; right: 0;
+  text-align: center;
+  font-size: 24px;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+/* ── cta ── */
+.cta-headline {
+  font-size: 76px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+.disclosure {
+  font-size: 21px;
+  line-height: 1.75;
+  color: var(--muted);
+  font-weight: 500;
+  max-width: 700px;
+  margin: 0 auto;
+}

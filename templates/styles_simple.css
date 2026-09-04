@@ -1,0 +1,194 @@
+/* ── 심플 테마 — 1080×1350, 화이트 + 볼드 고딕 + 하이라이트 1색 ── */
+
+:root {
+  --ink: #131313;
+  --gray: #9A9A9A;
+  --hl: #FFE94A;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  width: 1080px;
+  height: 1350px;
+  overflow: hidden;
+  font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+  color: var(--ink);
+  background: #FFFFFF;
+}
+
+.slide { position: relative; width: 1080px; height: 1350px; background: #fff; }
+
+mark {
+  background: linear-gradient(transparent 52%, var(--hl) 52%);
+  color: inherit;
+  padding: 0 2px;
+}
+
+.page {
+  position: absolute;
+  bottom: 44px; left: 0; right: 0;
+  text-align: center;
+  font-size: 22px;
+  font-weight: 600;
+  color: #C9C9C9;
+}
+
+/* hook / empathy — 텍스트 한 덩어리 */
+.hook-box {
+  position: absolute;
+  left: 96px; right: 96px;
+  top: 50%;
+  transform: translateY(-50%);
+  word-break: keep-all;
+}
+.hook-box h1 {
+  font-size: 96px;
+  font-weight: 800;
+  line-height: 1.38;
+  letter-spacing: -0.02em;
+}
+.hook-box .sub {
+  margin-top: 40px;
+  font-size: 31px;
+  font-weight: 500;
+  color: var(--gray);
+  line-height: 1.6;
+}
+
+/* photo — 큰 라운드 이미지 + 한 줄 */
+.photo-card {
+  position: absolute;
+  top: 56px; left: 56px; right: 56px;
+  height: 940px;
+  border-radius: 32px;
+  background-size: cover;
+  background-position: center top;
+}
+.photo-caption {
+  position: absolute;
+  left: 72px; right: 72px;
+  top: 1040px;
+  word-break: keep-all;
+}
+.photo-caption h2 {
+  font-size: 54px;
+  font-weight: 800;
+  line-height: 1.35;
+  letter-spacing: -0.015em;
+}
+.photo-caption .sub {
+  margin-top: 16px;
+  font-size: 27px;
+  font-weight: 500;
+  color: var(--gray);
+}
+
+/* body — 제목 + 짧은 리스트 */
+.body-box {
+  position: absolute;
+  left: 96px; right: 96px;
+  top: 50%;
+  transform: translateY(-50%);
+  word-break: keep-all;
+}
+.body-box h2 {
+  font-size: 76px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 64px;
+}
+.body-box ul { list-style: none; }
+.body-box li {
+  font-size: 40px;
+  font-weight: 600;
+  line-height: 1.5;
+  padding: 30px 0 30px 56px;
+  position: relative;
+}
+.body-box li::before {
+  content: "";
+  position: absolute;
+  left: 8px; top: 52px;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: var(--hl);
+}
+
+/* review */
+.review-title {
+  position: absolute;
+  top: 96px; left: 96px; right: 96px;
+  font-size: 58px;
+  font-weight: 800;
+  letter-spacing: -0.015em;
+  word-break: keep-all;
+}
+.review-img {
+  position: absolute;
+  left: 50%; top: 47%;
+  transform: translate(-50%, -50%);
+  width: 960px;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
+}
+
+/* quotes — 리뷰 원문 인용 (1~3개) */
+.quotes-box {
+  position: absolute;
+  left: 96px; right: 96px;
+  top: 50%;
+  transform: translateY(-50%);
+  word-break: keep-all;
+}
+.quotes-box h2 {
+  font-size: 54px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  line-height: 1.35;
+  margin-bottom: 56px;
+}
+.quotes-box ul { list-style: none; display: flex; flex-direction: column; gap: 46px; }
+.quotes-box li { padding-left: 34px; border-left: 8px solid var(--hl); }
+.quotes-box li p {
+  font-size: 38px;
+  font-weight: 600;
+  line-height: 1.5;
+  letter-spacing: -.015em;
+}
+.quotes-box li span {
+  display: block;
+  margin-top: 16px;
+  font-size: 25px;
+  font-weight: 500;
+  color: var(--gray);
+}
+
+/* 인용 1개일 때는 크게 */
+.quotes-box--1 li p { font-size: 60px; font-weight: 700; line-height: 1.45; }
+.quotes-box--1 li span { font-size: 28px; margin-top: 28px; }
+
+/* cta */
+.cta-box {
+  position: absolute;
+  left: 96px; right: 96px;
+  top: 46%;
+  transform: translateY(-50%);
+  text-align: center;
+  word-break: keep-all;
+}
+.cta-box h1 {
+  font-size: 92px;
+  font-weight: 800;
+  line-height: 1.4;
+  letter-spacing: -0.02em;
+}
+.disclosure {
+  position: absolute;
+  bottom: 96px; left: 120px; right: 120px;
+  text-align: center;
+  font-size: 20px;
+  font-weight: 500;
+  color: #B5B5B5;
+  line-height: 1.7;
+}
