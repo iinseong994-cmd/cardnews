@@ -67,6 +67,17 @@ PHOTO_PARTS = {
     "simple": {"band": (".photo-caption", 72, "offset"), "photo": (".photo-card", 56)},
 }
 
+# 표지 카드는 요소마다 제 좌표를 들고 있어서 .pad 규칙이 안 먹는다.
+# (선택자, 기본 left, 기본 right — right 가 None 이면 건드리지 않는다)
+COVER_PARTS = {
+    "frost": [
+        (".tag", 84, None),
+        (".slide--cover .mega", 84, None),
+        (".slide--cover .mega-sub", 88, None),
+        (".slide--cover .chips", 84, 84),
+    ],
+}
+
 
 def _num(v, fallback=0.0):
     try:
@@ -97,6 +108,17 @@ def build_css(theme, design):
     if pad:
         base = BASE_PAD.get(theme, 84)
         out.append(f'{t["pad"]} {{ left: {base + pad:.0f}px; right: {base + pad:.0f}px; }}')
+
+        # 표지 카드 — 요소마다 제 좌표를 들고 있어 따로 밀어준다
+        for sel, bl, br in COVER_PARTS.get(theme, []):
+            rule = f"left: {max(0, bl + pad):.0f}px;"
+            if br is not None:
+                rule += f" right: {max(0, br + pad):.0f}px;"
+            out.append(f"{sel} {{ {rule} }}")
+        # 표지 사진은 오른쪽 끝에 붙어 있다. 여백을 주면 안쪽으로 들어오게
+        if theme == "frost" and pad > 0:
+            out.append(f'.slide--cover .coverphoto {{ right: {pad:.0f}px;'
+                       f' border-radius: 26px; }}')
 
         # 사진 카드에도 같은 여백
         parts = PHOTO_PARTS.get(theme)
