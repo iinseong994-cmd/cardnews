@@ -40,6 +40,29 @@ import specs  # noqa: E402
 import review as reviewer  # noqa: E402
 import update as updater  # noqa: E402
 
+def setup_problem():
+    """설치가 안 됐으면 사람이 읽을 수 있는 안내를 돌려준다. 정상이면 None."""
+    missing = []
+    for mod, why in (("playwright", "쿠팡 크롤링·카드 렌더링"),
+                     ("PIL", "이미지 처리"),
+                     ("jinja2", "카드 템플릿")):
+        try:
+            __import__(mod)
+        except ImportError:
+            missing.append(f"{mod} ({why})")
+    if not missing:
+        return None
+    venv = ROOT / ".venv" / "Scripts" / "python.exe"
+    return ("설치가 끝나지 않았습니다.\n\n"
+            "없는 것: " + ", ".join(missing) + "\n\n"
+            + ("이 폴더에 설치가 안 돼 있습니다.\n"
+               if not venv.exists() else
+               "설치 폴더(.venv)는 있는데 그걸로 실행되지 않았습니다.\n")
+            + f"→ 폴더에서 '설치하기.bat' 를 더블클릭해 주세요.\n   ({ROOT})")
+
+
+SETUP_ERROR = setup_problem()
+
 JOBS = {}
 JOBS_LOCK = threading.Lock()
 
@@ -219,7 +242,7 @@ class Handler(BaseHTTPRequestHandler):
 
         if u.path == "/api/config":
             return self._send(200, {"themes": THEMES, "personas": personas(),
-                                    "hooks": HOOK_STYLES})
+                                    "hooks": HOOK_STYLES, "setupError": SETUP_ERROR})
 
         if u.path == "/api/status":
             job = q.get("job", [""])[0]
@@ -299,6 +322,8 @@ class Handler(BaseHTTPRequestHandler):
             return self._send(200, {"slides": slides, "stamp": int(datetime.now().timestamp())})
 
         if u.path == "/api/create":
+            if SETUP_ERROR:
+                return self._send(400, {"error": SETUP_ERROR})
             url = (body.get("url") or "").strip()
             if not body.get("folder") and not re.search(r"(coupang\.com|link\.coupang\.com)", url):
                 return self._send(400, {"error": "쿠팡 상품 링크가 아닙니다"})
@@ -322,6 +347,11 @@ def main():
     print("=" * 52)
     print("  쿠팡 카드뉴스 만들기")
     print("=" * 52)
+    if SETUP_ERROR:
+        print()
+        print("  [!] " + SETUP_ERROR.replace("\n", "\n      "))
+        print()
+        print("=" * 52)
     print(f"  브라우저가 열립니다 → {url}")
     print("  끄려면 이 창을 닫으세요.")
     print("=" * 52)

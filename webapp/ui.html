@@ -97,6 +97,8 @@
 <body>
 <div class="wrap">
 
+  <div class="err" id="setuperr" hidden style="margin-bottom:4px"></div>
+
   <header>
     <span class="badge">내 컴퓨터에서 실행 · 쿠팡 데이터 그대로</span>
     <h1>쿠팡 링크 하나로<br><em>카드뉴스가 완성됩니다</em></h1>
@@ -269,7 +271,15 @@ function paint(){
 
 $("#key").addEventListener("input", e => localStorage.setItem("key_"+S.provider, e.target.value));
 
-fetch("/api/config").then(r=>r.json()).then(c => { CFG = c; paint(); });
+fetch("/api/config").then(r=>r.json()).then(c => {
+  CFG = c; paint();
+  if(c.setupError){
+    $("#setuperr").hidden = false;
+    $("#setuperr").textContent = c.setupError;
+    $("#go").disabled = true;
+    $("#go").textContent = "설치를 먼저 끝내주세요";
+  }
+});
 paint();
 
 $("#go").onclick = async () => {
