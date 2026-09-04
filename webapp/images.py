@@ -27,8 +27,40 @@ MAX_TILES = 24
 
 # ── 후보 타일 ───────────────────────────────────────────────
 
+def quiet_rows(im, sample_w=120):
+    """가로로 변화가 거의 없는 행 = 섹션 사이 배경 띠.
+    여기서 잘라야 글자·제품이 한가운데서 안 잘린다."""
+    g = im.convert("L")
+    w, h = g.size
+    small = g.resize((sample_w, h))
+    px = small.load()
+    quiet = []
+    for y in range(h):
+        lo = hi = px[0, y]
+        for x in range(1, sample_w):
+            v = px[x, y]
+            if v < lo:
+                lo = v
+            elif v > hi:
+                hi = v
+        if hi - lo < 12:                # 그 줄이 거의 단색이면 조용한 행
+            quiet.append(y)
+    return set(quiet)
+
+
+def _snap(y, quiet, h, window=140):
+    """y 근처에서 가장 가까운 조용한 행으로 옮긴다"""
+    if y <= 0 or y >= h:
+        return max(0, min(y, h))
+    for d in range(window):
+        for cand in (y - d, y + d):
+            if 0 < cand < h and cand in quiet:
+                return cand
+    return y
+
+
 def slice_tiles(images_dir):
-    """긴 이미지 → 겹치는 정사각 후보 타일 목록"""
+    """긴 이미지 → 후보 타일. 경계는 배경 띠에 맞춰 잡는다."""
     tiles = []
     for f in sorted(Path(images_dir).iterdir()):
         if f.suffix.lower() not in (".jpg", ".jpeg", ".png", ".webp"):
@@ -44,10 +76,14 @@ def slice_tiles(images_dir):
         if h <= tile_h * 1.2:
             tiles.append({"file": f.name, "y0": 0, "y1": h})
             continue
-        step = int(tile_h * 0.7)        # 30% 겹침 — 좋은 컷이 경계에 걸리는 걸 줄인다
+        quiet = quiet_rows(im)
+        step = int(tile_h * 0.7)        # 30% 겹침
         y = 0
         while y + tile_h <= h and len(tiles) < MAX_TILES * 3:
-            tiles.append({"file": f.name, "y0": y, "y1": y + tile_h})
+            y0 = _snap(y, quiet, h)
+            y1 = _snap(y + tile_h, quiet, h)
+            if y1 - y0 > w * 0.55:      # 너무 납작해지면 버린다
+                tiles.append({"file": f.name, "y0": y0, "y1": y1})
             y += step
     return tiles[:MAX_TILES]
 
@@ -169,7 +205,7 @@ def _fit(im, tw=CARD_W, th=CARD_H):
 
 
 def build_card_images(output_dir, tiles, picks):
-    """고른 번호 → card_images/*.jpg"""
+    """고른 번호 → card_images/*.jpg  (+ 표지용 세로컷 cover.jpg)"""
     output_dir = Path(output_dir)
     images_dir = output_dir / "images"
     dst = output_dir / "card_images"
@@ -184,6 +220,11 @@ def build_card_images(output_dir, tiles, picks):
         name = f"photo_{rank:02d}.jpg"
         _fit(crop).save(dst / name, quality=94)
         made.append(f"card_images/{name}")
+
+        # 표지 사진칸은 470x768 세로다. 정사각 컷을 넣으면 좌우가 크게 잘린다.
+        if rank == 1:
+            _fit(crop, 940, 1536).save(dst / "cover.jpg", quality=94)
+            made.insert(0, "card_images/cover.jpg")
     return made
 
 

@@ -22,14 +22,19 @@ SCHEMA = """{
   "palette": "<팔레트>",
   "slides": [
     {"no":1,"type":"cover","eyebrow":"<후크 12~20자>","headline":"<대형문구 줄당 3~4자, \\n으로 줄바꿈>",
-     "subhead":"<한두 줄 설명>","image_path":"<표지 사진 또는 null>","chips":["<뱃지>","<뱃지>","<뱃지>"]},
+     "subhead":"<한두 줄 설명>","image_path":"card_images/cover.jpg","chips":["<뱃지>","<뱃지>","<뱃지>"]},
     {"no":2,"type":"statement","headline":"<제목, **강조** 가능>","subhead":"<두세 줄>","image_path":null},
     {"no":3,"type":"photo","eyebrow":"<라벨>","headline":"<한 줄>","subhead":"<보조 한 줄>","image_path":"<사진>"},
     {"no":4,"type":"photo","headline":"<한 줄>","subhead":"<보조>","image_path":"<사진>"},
-    {"no":5,"type":"spec","headline":"확인한 것만\\n적었습니다","rows":[{"k":"<항목>","v":"<값>"}],"chips":["<인증·AS>"]},
+    {"no":5,"type":"spec","headline":"확인한 것만\\n적었습니다",
+     "rows":[{"k":"<항목1>","v":"<값>"},{"k":"<항목2>","v":"<값>"},{"k":"<항목3>","v":"<값>"},
+             {"k":"<항목4>","v":"<값>"},{"k":"<항목5>","v":"<값>"}],"chips":["<인증>","<A/S>"]},
     {"no":6,"type":"photo","eyebrow":"<라벨>","headline":"<한 줄>","subhead":"<보조>","image_path":"<사진>"},
     {"no":7,"type":"review","headline":"리뷰 **<N>개** · 평점 <X>","image_path":"<리뷰카드 png>"},
-    {"no":8,"type":"quotes","headline":"<제목>","quotes":[{"text":"<리뷰 원문 그대로>","who":"<작성자>"}],"image_path":null},
+    {"no":8,"type":"quotes","headline":"<제목>","image_path":null,
+     "quotes":[{"text":"<리뷰 원문 그대로>","who":"<작성자>"},
+               {"text":"<리뷰 원문 그대로>","who":"<작성자>"},
+               {"text":"<리뷰 원문 그대로>","who":"<작성자>"}]},
     {"no":9,"type":"list","headline":"이런 분께\\n맞아요","bullets":["<대상1>","<대상2>","<대상3>","<안 맞는 대상>"],"image_path":null},
     {"no":10,"type":"cta","headline":"가격은 첫 댓글에\\n적어둘게요 👇","chips":["<뱃지>"],
      "subhead":"이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다"}
@@ -54,7 +59,15 @@ RULES = """
    - 제품 사진이 하나도 없으면 cover 의 image_path 는 null 로 두고 photo 슬라이드를 아예 쓰지 않는다
 6. **9번 마지막 bullet은 "안 맞는 대상"**을 쓴다 (제품 흠이 아니라 용도 한정). 예: "조용한 실내에서만 쓰실 거면 이건 아니에요"
 7. 대형 문구(cover headline)는 **한 줄에 3~4자**, 최대 2줄. 길면 잘린다.
-8. **JSON만 출력한다.** 설명·마크다운 코드펜스 없이 `{` 로 시작해서 `}` 로 끝낸다.
+8. **분량을 채운다.** 카드가 비어 보이면 안 된다.
+   - `spec` 의 rows 는 **5~7줄**. 상세페이지에서 확인된 항목을 최대한 담는다
+     (소재·용량·크기·무게·성능 수치·배터리·인증·구성품·제조사 등)
+   - `quotes` 는 **3개**. 리뷰가 부족하면 있는 만큼만 쓰되 최소 2개
+   - `list` 의 bullets 는 **4개** (마지막은 안 맞는 대상)
+   - `photo` 슬라이드는 **headline 과 subhead 를 둘 다** 채운다. 한 줄만 두지 않는다
+   - `chips` — cover 3개, spec 1~2개(인증·A/S), cta 2~3개
+9. **표지 사진은 `card_images/cover.jpg` 가 있으면 그것을 쓴다.** (표지 칸 비율에 맞춰 만든 세로컷이다)
+10. **JSON만 출력한다.** 설명·마크다운 코드펜스 없이 `{` 로 시작해서 `}` 로 끝낸다.
 """
 
 
@@ -232,11 +245,15 @@ def sanitize(data, output_dir, theme, palette):
                 path = None
         if sl.get("type") == "photo" and not sl.get("image_path"):
             sl["type"] = "statement"           # 사진 없으면 텍스트 카드로
-        if sl.get("type") == "cover" and not sl.get("image_path") and not sl.get("cutout"):
-            first = sorted((output_dir / "card_images").glob("*.jpg")) \
-                if (output_dir / "card_images").exists() else []
-            if first:
-                sl["image_path"] = f"card_images/{first[0].name}"
+        if sl.get("type") == "cover" and not sl.get("cutout"):
+            cover = output_dir / "card_images" / "cover.jpg"
+            if cover.exists():
+                sl["image_path"] = "card_images/cover.jpg"   # 표지 비율에 맞는 세로컷
+            elif not sl.get("image_path"):
+                first = sorted((output_dir / "card_images").glob("*.jpg")) \
+                    if (output_dir / "card_images").exists() else []
+                if first:
+                    sl["image_path"] = f"card_images/{first[0].name}"
         # 표지 대형 문구는 3줄까지만 (4줄 넘으면 아래 설명과 겹친다)
         if sl.get("type") == "cover" and sl.get("headline"):
             lines = [x for x in sl["headline"].split("\n") if x.strip()]
