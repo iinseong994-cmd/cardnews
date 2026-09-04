@@ -126,7 +126,8 @@ def contact_sheet(images_dir, tiles, cols=4, cell=210):
 
 PROMPT = """이건 쇼핑몰 상세페이지를 잘라 만든 후보 이미지 모음이다. 각 칸 왼쪽 위에 번호가 있다.
 
-카드뉴스 배경으로 쓸 **제품 사진**을 좋은 순서대로 최대 5개 골라라.
+카드뉴스 배경으로 쓸 **제품 사진**을 좋은 순서대로 최대 6개 골라라.
+서로 다른 장면이면 좋다. (제품 단독 / 사용 장면 / 부분 확대 등)
 
 고르는 기준
 - 제품이 크고 선명하게 보이는 컷 ⭕
@@ -179,7 +180,7 @@ def pick_with_vision(provider, api_key, model, sheet_png, post):
     return [int(n) for n in re.findall(r"\d+", m.group(0))] if m else []
 
 
-def pick_by_heuristic(images_dir, tiles, want=4):
+def pick_by_heuristic(images_dir, tiles, want=6):
     """AI를 못 쓸 때 — 글자가 적은 타일을 고른다"""
     scored = []
     for i, t in enumerate(tiles):
@@ -266,6 +267,6 @@ def prepare(output_dir, provider=None, api_key=None, model=None, post=None, log=
         picks = pick_by_heuristic(images_dir, tiles)
         log(f"자동 선별 결과: {picks}")
 
-    made = build_card_images(output_dir, tiles, picks[:5])
+    made = build_card_images(output_dir, tiles, picks[:6])
     log(f"제품컷 {len(made)}장 생성")
     return made
