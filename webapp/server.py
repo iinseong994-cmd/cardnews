@@ -37,6 +37,7 @@ sys.path.insert(0, str(WEBAPP))
 import gen  # noqa: E402
 import images as imgpick  # noqa: E402
 import specs  # noqa: E402
+import review as reviewer  # noqa: E402
 import update as updater  # noqa: E402
 
 JOBS = {}
@@ -155,6 +156,16 @@ def worker(job, req):
 
         stage(job, "카드 렌더링 — PNG 만드는 중")
         run(job, [PY, str(ROOT / "scripts" / "render.py"), str(folder / "slides.json")], "렌더링")
+
+        fixes = []
+        if req.get("review", True):
+            stage(job, "검수 — 만든 카드를 보고 잘못된 곳을 고칩니다")
+            fixes = reviewer.run(folder, req.get("provider"), req.get("apiKey"),
+                                 req.get("model"), gen._post, lambda m: log(job, m))
+        if fixes:
+            stage(job, f"수정한 {len(fixes)}장 다시 그리는 중")
+            run(job, [PY, str(ROOT / "scripts" / "render.py"), str(folder / "slides.json"),
+                      "--only", ",".join(str(n) for n in fixes)], "재렌더링")
 
         slides = sorted(folder.glob("slide_*.png"))
         with JOBS_LOCK:

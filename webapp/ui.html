@@ -135,6 +135,10 @@
     <div class="grid g3" id="personas"></div>
     <label class="lbl" style="margin-top:6px">표지 후크 방향</label>
     <div class="chips" id="hooks"></div>
+    <label class="row" style="gap:7px;font-size:14px;margin-top:4px">
+      <input type="checkbox" id="doreview" checked style="width:auto">
+      만든 카드를 AI가 다시 보고 고치기 <span class="hint">(30~60초 더 걸립니다)</span>
+    </label>
   </section>
 
   <button class="go" id="go">⚡ 카드뉴스 만들기</button>
@@ -274,7 +278,7 @@ $("#go").onclick = async () => {
   if(!url) return alert("쿠팡 상품 링크를 넣어주세요.");
   if(!apiKey) return alert("API 키를 넣어주세요. 위 안내 링크에서 무료로 받을 수 있습니다.");
   const model = PROVIDERS.find(p=>p.id===S.provider).model;
-  start({url, apiKey, model, ...S});
+  start({url, apiKey, model, review: $("#doreview").checked, ...S});
 };
 
 function fail(msg, folder){
@@ -309,7 +313,8 @@ $("#retry").onclick = () => {
   const apiKey = $("#key").value.trim();
   if(!apiKey) return alert("API 키를 넣어주세요.");
   const model = PROVIDERS.find(p=>p.id===S.provider).model;
-  start({url: $("#url").value.trim(), apiKey, model, folder: FOLDER, ...S});
+  start({url: $("#url").value.trim(), apiKey, model, folder: FOLDER,
+         review: $("#doreview").checked, ...S});
 };
 
 async function poll(){
