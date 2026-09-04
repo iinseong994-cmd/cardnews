@@ -55,6 +55,18 @@ THEMES = {
 # 테마별 .pad 기본 좌우 여백(px) — pad 가감의 기준
 BASE_PAD = {"frost": 84, "bold": 88, "simple": 96}
 
+# 사진 카드에도 같은 여백을 먹인다.
+#   band  : 사진 아래 글자 띠 — (선택자, 기본값, 쓰는 속성)
+#   photo : 사진 자체 — (선택자, 기본값)
+#
+# ⚠️ 테마마다 자리를 잡는 방식이 다르다. frost·bold 의 .band 는 padding 으로,
+#    simple 의 .photo-caption 은 left/right 로 잡는다. 섞으면 여백이 두 번 더해진다.
+PHOTO_PARTS = {
+    "frost":  {"band": (".band", 76, "padding"), "photo": (".bleed", 0)},
+    "bold":   {"band": (".band", 72, "padding"), "photo": (".bleed", 0)},
+    "simple": {"band": (".photo-caption", 72, "offset"), "photo": (".photo-card", 56)},
+}
+
 
 def _num(v, fallback=0.0):
     try:
@@ -85,6 +97,25 @@ def build_css(theme, design):
     if pad:
         base = BASE_PAD.get(theme, 84)
         out.append(f'{t["pad"]} {{ left: {base + pad:.0f}px; right: {base + pad:.0f}px; }}')
+
+        # 사진 카드에도 같은 여백
+        parts = PHOTO_PARTS.get(theme)
+        if parts:
+            bsel, bbase, bmode = parts["band"]
+            bv = max(0, bbase + pad)
+            if bmode == "padding":
+                out.append(f'{bsel} {{ padding-left: {bv:.0f}px; padding-right: {bv:.0f}px; }}')
+            else:
+                out.append(f'{bsel} {{ left: {bv:.0f}px; right: {bv:.0f}px; }}')
+            psel, pbase = parts["photo"]
+            inset = max(0, pbase + pad)
+            if psel == ".bleed":          # 원래 화면 끝까지 차던 사진
+                if inset > 0:
+                    out.append(f'.bleed {{ left: {inset:.0f}px;'
+                               f' width: {1080 - 2 * inset:.0f}px;'
+                               f' border-radius: 22px; }}')
+            else:                          # 원래 여백이 있던 사진 (simple)
+                out.append(f'{psel} {{ left: {inset:.0f}px; right: {inset:.0f}px; }}')
 
     out += _scale_rules(t["title"], _num(d["titleScale"], 100))
     out += _scale_rules(t["body"], _num(d["bodyScale"], 100))
