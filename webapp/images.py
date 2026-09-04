@@ -154,7 +154,7 @@ def pick_with_vision(provider, api_key, model, sheet_png, post):
             {"text": PROMPT},
             {"inline_data": {"mime_type": "image/png", "data": b}}]}],
             "generationConfig": {"temperature": 0.1, "maxOutputTokens": 256}},
-            {"x-goog-api-key": api_key}, provider="gemini")
+            {"x-goog-api-key": api_key}, timeout=90, provider="gemini")
         text = data["candidates"][0]["content"]["parts"][0]["text"]
     elif provider == "claude":
         data = post("https://api.anthropic.com/v1/messages",
@@ -164,7 +164,7 @@ def pick_with_vision(provider, api_key, model, sheet_png, post):
                          {"type": "image", "source": {"type": "base64",
                                                       "media_type": "image/png", "data": b}}]}]},
                     {"x-api-key": api_key, "anthropic-version": "2023-06-01"},
-                    provider="claude")
+                    timeout=90, provider="claude")
         text = data["content"][0]["text"]
     else:
         data = post("https://api.openai.com/v1/chat/completions",
@@ -173,7 +173,7 @@ def pick_with_vision(provider, api_key, model, sheet_png, post):
                          {"type": "text", "text": PROMPT},
                          {"type": "image_url",
                           "image_url": {"url": "data:image/png;base64," + b}}]}]},
-                    {"Authorization": f"Bearer {api_key}"}, provider="gpt")
+                    {"Authorization": f"Bearer {api_key}"}, timeout=90, provider="gpt")
         text = data["choices"][0]["message"]["content"]
 
     m = re.search(r"\[[^\]]*\]", text)

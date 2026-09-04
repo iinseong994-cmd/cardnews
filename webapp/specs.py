@@ -24,8 +24,9 @@ from PIL import Image, ImageDraw, ImageFont
 from images import _textiness
 
 FIND_W = 300         # 1단계: 어디 있나만 보면 되니 작게
-READ_W = 1280        # 2단계: 표 글씨가 읽혀야 하니 크게
-MAX_READ = 8         # 확대해서 읽을 칸 수
+READ_W = 1180        # 2단계: 표 글씨가 읽혀야 하니 크게
+READ_MAX_H = 2200    # 너무 길면 처리량이 폭증한다
+MAX_READ = 5         # 확대해서 읽을 칸 수 (많이 보내면 GPT 가 크게 느려진다)
 MAX_CHUNKS = 40      # 후보 상한
 
 
@@ -94,10 +95,13 @@ def _crop(images_dir, c):
     return im.crop((0, c["y0"], im.size[0], c["y1"]))
 
 
-def _encode(im, width, quality=90):
+def _encode(im, width, quality=88, max_h=None):
     w, h = im.size
     if w != width:
         im = im.resize((width, max(1, int(h * width / w))), Image.LANCZOS)
+    if max_h and im.size[1] > max_h:          # 지나치게 긴 그림은 줄인다
+        w2, h2 = im.size
+        im = im.resize((max(1, int(w2 * max_h / h2)), max_h), Image.LANCZOS)
     buf = io.BytesIO()
     im.save(buf, "JPEG", quality=quality)
     return base64.b64encode(buf.getvalue()).decode()
@@ -184,7 +188,7 @@ def _ask(provider, api_key, model, prompt, images_b64, post, max_tokens=2048):
         d = post(url, {"contents": [{"parts": parts}],
                        "generationConfig": {"temperature": 0.1,
                                             "maxOutputTokens": max_tokens}},
-                 {"x-goog-api-key": api_key}, provider="gemini")
+                 {"x-goog-api-key": api_key}, timeout=90, provider="gemini")
         return d["candidates"][0]["content"]["parts"][0]["text"]
 
     if provider == "claude":
@@ -196,18 +200,18 @@ def _ask(provider, api_key, model, prompt, images_b64, post, max_tokens=2048):
                  {"model": model or "claude-sonnet-4-5", "max_tokens": max_tokens,
                   "messages": [{"role": "user", "content": content}]},
                  {"x-api-key": api_key, "anthropic-version": "2023-06-01"},
-                 provider="claude")
+                 timeout=90, provider="claude")
         return d["content"][0]["text"]
 
     content = [{"type": "text", "text": prompt}]
     for b in images_b64:
         content.append({"type": "image_url",
-                        "image_url": {"url": "data:image/jpeg;base64," + b, "detail": "high"}})
+                        "image_url": {"url": "data:image/jpeg;base64," + b, "detail": "high"}})  # 표 글씨를 읽어야 해서 high 유지
     d = post("https://api.openai.com/v1/chat/completions",
              {"model": model or "gpt-4o", "temperature": 0.1,
               "max_tokens": max_tokens,
               "messages": [{"role": "user", "content": content}]},
-             {"Authorization": f"Bearer {api_key}"}, provider="gpt")
+             {"Authorization": f"Bearer {api_key}"}, timeout=90, provider="gpt")
     return d["choices"][0]["message"]["content"]
 
 
@@ -288,7 +292,8 @@ def prepare(output_dir, provider, api_key, model, post, log=print):
 
     # 2단계 — 그 칸만 확대해서 읽기
     picks = picks[:MAX_READ]
-    imgs = [_encode(_crop(images_dir, chunks[n - 1]), READ_W) for n in picks]
+    imgs = [_encode(_crop(images_dir, chunks[n - 1]), READ_W, max_h=READ_MAX_H)
+            for n in picks]
     log(f"{len(imgs)}칸을 {READ_W}px 로 확대해 읽는 중...")
 
     try:

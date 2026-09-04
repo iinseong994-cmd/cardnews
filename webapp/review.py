@@ -18,7 +18,7 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
 
-SHOT_W = 620          # 카드 한 장을 보낼 해상도 (글자가 읽혀야 한다)
+SHOT_W = 540          # 카드 한 장을 보낼 해상도 (글자가 읽혀야 한다)
 MAX_SHOTS = 10
 
 
@@ -91,7 +91,7 @@ def _ask(provider, api_key, model, prompt, imgs, post, max_tokens=2500):
         d = post(url, {"contents": [{"parts": parts}],
                        "generationConfig": {"temperature": 0.2,
                                             "maxOutputTokens": max_tokens}},
-                 {"x-goog-api-key": api_key}, provider="gemini")
+                 {"x-goog-api-key": api_key}, timeout=90, provider="gemini")
         return d["candidates"][0]["content"]["parts"][0]["text"]
     if provider == "claude":
         content = [{"type": "text", "text": prompt}]
@@ -102,18 +102,18 @@ def _ask(provider, api_key, model, prompt, imgs, post, max_tokens=2500):
                  {"model": model or "claude-sonnet-4-5", "max_tokens": max_tokens,
                   "messages": [{"role": "user", "content": content}]},
                  {"x-api-key": api_key, "anthropic-version": "2023-06-01"},
-                 provider="claude")
+                 timeout=90, provider="claude")
         return d["content"][0]["text"]
     content = [{"type": "text", "text": prompt}]
     for b in imgs:
         content.append({"type": "image_url",
                         "image_url": {"url": "data:image/jpeg;base64," + b,
-                                      "detail": "high"}})
+                                      "detail": "auto"}})
     d = post("https://api.openai.com/v1/chat/completions",
              {"model": model or "gpt-4o", "temperature": 0.2,
               "max_tokens": max_tokens,
               "messages": [{"role": "user", "content": content}]},
-             {"Authorization": f"Bearer {api_key}"}, provider="gpt")
+             {"Authorization": f"Bearer {api_key}"}, timeout=90, provider="gpt")
     return d["choices"][0]["message"]["content"]
 
 
