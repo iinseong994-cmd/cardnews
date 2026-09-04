@@ -221,9 +221,20 @@ def build_card_images(output_dir, tiles, picks):
         _fit(crop).save(dst / name, quality=94)
         made.append(f"card_images/{name}")
 
-        # 표지 사진칸은 470x768 세로다. 정사각 컷을 넣으면 좌우가 크게 잘린다.
+        # 표지 사진칸은 470x768 세로다.
+        # 정사각 컷에서 좌우를 잘라내면 글자·제품이 잘린다.
+        # 그래서 **원본에서 세로로 더 길게** 떠서 가로를 온전히 남긴다.
         if rank == 1:
-            _fit(crop, 940, 1536).save(dst / "cover.jpg", quality=94)
+            iw, ih = im.size
+            want_h = int(iw * 1536 / 940)            # 가로를 다 쓰려면 필요한 높이
+            cy = (t["y0"] + t["y1"]) // 2
+            top = max(0, min(cy - want_h // 2, ih - want_h))
+            if want_h <= ih:
+                tall = im.crop((0, top, iw, top + want_h))
+            else:                                    # 원본이 짧으면 위아래를 채운다
+                tall = Image.new("RGB", (iw, want_h), (255, 255, 255))
+                tall.paste(im, (0, (want_h - ih) // 2))
+            _fit(tall, 940, 1536).save(dst / "cover.jpg", quality=94)
             made.insert(0, "card_images/cover.jpg")
     return made
 

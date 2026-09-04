@@ -79,7 +79,14 @@ RULES = """
 13. **구성품에서 빠진 것·조건이 있으면 9번 마지막 줄에 알려줘라.**
     (예: "USB-C 케이블은 안 들어 있으니 따로 챙기세요")
     숨기지 않고 알려주는 편이 신뢰를 만든다. 제품을 깎는 말은 아니다.
-14. **JSON만 출력한다.** 설명·마크다운 코드펜스 없이 `{` 로 시작해서 `}` 로 끝낸다.
+14. **뭉뚱그린 말을 쓰지 마라.** 카드 제목에 형용사만 있으면 안 된다.
+    ❌ "세련된 디자인" / "인상적인 착용감" / "뛰어난 음질" / "갤럭시 버즈4 프로 특징"
+    ⭕ "케이스가 반투명입니다" / "무게중심이 내려갔어요" / "스피커가 두 개예요"
+    photo·statement 슬라이드의 headline 에는 **확인된 사실이나 숫자**가 들어가야 한다.
+15. **표지 대형 문구에 상품명·브랜드명을 쓰지 마라.**
+    ❌ "버즈4 / 프로" / "갤럭시 / 버즈4" ← 이름만 크게 쓴 표지는 아무 정보가 없다
+    ⭕ 읽는 사람이 궁금해할 한 가지를 문장으로. (예: "에어팟 / 팔고 / 샀대요")
+16. **JSON만 출력한다.** 설명·마크다운 코드펜스 없이 `{` 로 시작해서 `}` 로 끝낸다.
 """
 
 
@@ -101,6 +108,8 @@ def build_prompt(summary, reviews, images, review_imgs, hooks_md, persona_md,
 {summary}
 
 # 리뷰 (원문 — 인용은 여기서 그대로 가져온다)
+※ 맨 위의 "총 N건" 은 **크롤링해온 표본 수**다. 실제 리뷰 수가 아니다.
+   리뷰 수·평점은 위 "상품 정보" 표의 값만 쓴다.
 {reviews}
 
 # 상세페이지에서 확인한 내용  ← **스펙 카드와 표지 후크는 여기서 뽑는다**
@@ -237,10 +246,39 @@ def extract_json(text):
     return json.loads(t[start:end + 1])
 
 
+def crawled_numbers(output_dir):
+    """summary.md 에서 리뷰 수·평점을 그대로 가져온다.
+
+    review.md 의 '총 N건' 은 **크롤링해온 표본 수**지 실제 리뷰 수가 아니다.
+    AI 가 그걸 리뷰 수로 착각한 적이 있어서, 이 값은 코드가 직접 채운다.
+    """
+    out = {}
+    f = Path(output_dir) / "summary.md"
+    if not f.exists():
+        return out
+    for line in f.read_text(encoding="utf-8").splitlines():
+        m = re.match(r"\|\s*(리뷰 수|평점)\s*\|\s*([^|]+?)\s*\|", line)
+        if m:
+            out[m.group(1)] = m.group(2).strip()
+    return out
+
+
+def review_headline(nums):
+    n, r = nums.get("리뷰 수"), nums.get("평점")
+    if not n or n == "-":
+        return None
+    try:
+        n = f"{int(str(n).replace(',', '')):,}"
+    except ValueError:
+        pass
+    return f"리뷰 **{n}개**" + (f" · 평점 {r}" if r and r != "-" else "")
+
+
 def sanitize(data, output_dir, theme, palette):
-    """존재하지 않는 이미지 경로 제거 + 필수 항목 보정"""
+    """존재하지 않는 이미지 경로 제거 + 필수 항목 보정 + 숫자 바로잡기"""
     data["theme"] = theme
     data["palette"] = palette
+    fixed_headline = review_headline(crawled_numbers(output_dir))
     fixed = []
     for i, sl in enumerate(data.get("slides", []), 1):
         sl["no"] = i
@@ -257,6 +295,10 @@ def sanitize(data, output_dir, theme, palette):
                 path = None
         if sl.get("type") == "photo" and not sl.get("image_path"):
             sl["type"] = "statement"           # 사진 없으면 텍스트 카드로
+        # 리뷰 수·평점은 AI 가 쓴 값을 믿지 않고 크롤 데이터로 덮어쓴다
+        if sl.get("type") == "review" and fixed_headline:
+            if sl.get("headline") != fixed_headline:
+                sl["headline"] = fixed_headline
         if sl.get("type") == "cover" and not sl.get("cutout"):
             cover = output_dir / "card_images" / "cover.jpg"
             if cover.exists():
