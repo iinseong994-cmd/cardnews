@@ -78,6 +78,25 @@ def main():
         shutil.copy2(src, DEST / f)
         copied.append(f)
 
+    # 배포본이 자기 버전을 알아야 "업데이트 확인" 이 제대로 뜬다
+    try:
+        import sys as _sys
+        _sys.path.insert(0, str(ROOT / "webapp"))
+        import update as _u
+        info = _u.remote_version()
+        (DEST / "version.json").write_text(
+            '{
+  "sha": "%s",
+  "message": %s,
+  "applied_at": "배포본"
+}
+'
+            % (info["sha"], __import__("json").dumps(info["message"], ensure_ascii=False)),
+            encoding="utf-8")
+        print("버전 표시:", info["sha"][:7])
+    except Exception as e:
+        print("버전 표시 실패(무시하고 진행):", e)
+
     # 받는 사람이 처음 켰을 때 빈 폴더가 있어야 한다
     (DEST / "output").mkdir(exist_ok=True)
     (DEST / "output" / "여기에 결과가 저장됩니다.txt").write_text(

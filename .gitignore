@@ -30,3 +30,6 @@ Thumbs.db
 desktop.ini
 .vscode/
 .idea/
+
+# 설치별 상태 (업데이트 기록) — 각 컴퓨터마다 다르다
+version.json

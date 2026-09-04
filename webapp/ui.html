@@ -200,6 +200,17 @@
     <img id="onecard" hidden style="width:230px;border:1px solid var(--line);border-radius:5px">
   </section>
 
+  <section id="upd">
+    <div class="head"><h2>프로그램 업데이트</h2>
+      <span class="note" id="updver"></span></div>
+    <div class="row">
+      <button class="btn ghost" id="updcheck">업데이트 확인</button>
+      <button class="btn" id="updapply" hidden>최신으로 바꾸기</button>
+      <span class="hint" id="updmsg">최신 기능이 나왔는지 확인합니다.</span>
+    </div>
+    <pre class="log" id="updlog" hidden></pre>
+  </section>
+
   <footer>카드뉴스는 <code>output/</code> 폴더에도 저장됩니다.</footer>
 </div>
 
@@ -348,6 +359,48 @@ function show(d){
 }
 
 $("#lb").onclick = () => $("#lb").close();
+
+/* ── 프로그램 업데이트 ── */
+async function updCheck(){
+  const btn = $("#updcheck");
+  btn.disabled = true; $("#updmsg").textContent = "확인하는 중...";
+  try{
+    const d = await (await fetch("/api/update/check")).json();
+    if(d.error) throw new Error(d.error);
+    $("#updver").textContent = "현재 " + d.current;
+    if(d.latest){
+      $("#updmsg").textContent = "최신 버전입니다.";
+      $("#updapply").hidden = true;
+    } else {
+      $("#updmsg").textContent = `새 버전이 있습니다 (${d.newest}, ${d.date}) — ${d.message}`;
+      $("#updapply").hidden = false;
+    }
+  } catch(e){
+    $("#updmsg").textContent = "확인 실패: " + e.message;
+  } finally { btn.disabled = false; }
+}
+
+async function updApply(){
+  const btn = $("#updapply");
+  btn.disabled = true; btn.textContent = "받는 중...";
+  $("#updlog").hidden = false; $("#updlog").textContent = "";
+  try{
+    const d = await (await fetch("/api/update/apply", {method:"POST",
+      headers:{"Content-Type":"application/json"}, body:"{}"})).json();
+    $("#updlog").textContent = (d.log||[]).join("\n");
+    if(d.error) throw new Error(d.error);
+    $("#updmsg").innerHTML = d.updated
+      ? "<b>업데이트 완료 — 프로그램을 껐다 켜야 적용됩니다.</b><br>검은 창을 닫고 '카드뉴스 만들기'를 다시 더블클릭하세요."
+      : "이미 최신입니다.";
+    $("#updapply").hidden = true;
+  } catch(e){
+    $("#updmsg").textContent = "실패: " + e.message;
+  } finally { btn.disabled = false; btn.textContent = "최신으로 바꾸기"; }
+}
+
+$("#updcheck").onclick = updCheck;
+$("#updapply").onclick = updApply;
+updCheck();
 
 /* ── 디자인 다듬기 ── */
 const sl = [["dtitle","vtitle","%"],["dbody","vbody","%"],["dpad","vpad","px"]];

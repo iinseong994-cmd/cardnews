@@ -37,6 +37,7 @@ sys.path.insert(0, str(WEBAPP))
 import gen  # noqa: E402
 import images as imgpick  # noqa: E402
 import specs  # noqa: E402
+import update as updater  # noqa: E402
 
 JOBS = {}
 JOBS_LOCK = threading.Lock()
@@ -199,6 +200,12 @@ class Handler(BaseHTTPRequestHandler):
             return self._send(200, (WEBAPP / "ui.html").read_text(encoding="utf-8"),
                               "text/html; charset=utf-8")
 
+        if u.path == "/api/update/check":
+            try:
+                return self._send(200, updater.check())
+            except Exception as e:
+                return self._send(200, {"error": f"업데이트 확인 실패: {e}"})
+
         if u.path == "/api/config":
             return self._send(200, {"themes": THEMES, "personas": personas(),
                                     "hooks": HOOK_STYLES})
@@ -247,6 +254,15 @@ class Handler(BaseHTTPRequestHandler):
         u = urllib.parse.urlparse(self.path)
         length = int(self.headers.get("Content-Length", 0))
         body = json.loads(self.rfile.read(length) or b"{}")
+
+        if u.path == "/api/update/apply":
+            lines = []
+            try:
+                r = updater.apply(log=lambda m: lines.append(m))
+                r["log"] = lines
+                return self._send(200, r)
+            except Exception as e:
+                return self._send(200, {"error": f"업데이트 실패: {e}", "log": lines})
 
         if u.path == "/api/redesign":
             folder = (body.get("folder") or "").strip()
