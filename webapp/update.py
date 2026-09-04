@@ -102,6 +102,10 @@ def apply(log=print):
         for info, rel in members:
             target = ROOT / rel
             data = zf.read(info)
+            if target.suffix.lower() in (".bat", ".cmd"):
+                # Windows cmd 는 배치 파일에 CRLF 가 없으면 줄을 못 끊는다.
+                # 어디선가 LF 로 바뀌어 와도 여기서 되돌린다.
+                data = data.replace(b"\r\n", b"\n").replace(b"\n", b"\r\n")
             if target.exists() and target.read_bytes() == data:
                 continue
             target.parent.mkdir(parents=True, exist_ok=True)

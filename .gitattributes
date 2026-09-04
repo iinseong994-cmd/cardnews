@@ -1,0 +1,12 @@
+# 배치 파일은 줄바꿈을 절대 건드리지 않는다.
+# git 이 CRLF 를 LF 로 바꿔버리면 Windows cmd 가 줄을 못 끊고,
+# 한글(2바이트)과 엉켜서 다음 글자를 하나씩 먹는다. (echo → cho)
+*.bat -text
+*.cmd -text
+
+# 폰트·이미지도 그대로
+*.ttf binary
+*.otf binary
+*.png binary
+*.jpg binary
+*.jpeg binary
