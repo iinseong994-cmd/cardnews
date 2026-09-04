@@ -106,9 +106,11 @@ def log(job, msg):
     print(f"[{job[:6]}] {msg}")
 
 
-def stage(job, s):
+def stage(job, s, pct=None):
     with JOBS_LOCK:
         JOBS[job]["stage"] = s
+        if pct is not None:
+            JOBS[job]["percent"] = pct
     log(job, f"── {s}")
 
 
@@ -145,9 +147,11 @@ def worker(job, req):
             with JOBS_LOCK:
                 JOBS[job]["folder"] = folder.name
             log(job, f"크롤링 건너뜀 — 기존 폴더 사용: {folder.name}")
+            with JOBS_LOCK:
+                JOBS[job]["percent"] = 40
         else:
             before = {d for d in OUTPUT.iterdir() if d.is_dir()}
-            stage(job, "크롤링 — Chrome 창이 뜹니다. 건드리지 마세요")
+            stage(job, "크롤링 — Chrome 창이 뜹니다. 건드리지 마세요", 5)
             run(job, [PY, str(ROOT / "crawl.py"), req["url"], "--max-review-pages", "1"], "크롤링")
 
             folder = newest_output(before)
@@ -157,19 +161,19 @@ def worker(job, req):
                 JOBS[job]["folder"] = folder.name
             log(job, f"상품 폴더: {folder.name}")
 
-            stage(job, "이미지 가공 — 리뷰 카드 렌더링")
+            stage(job, "이미지 가공 — 리뷰 카드 렌더링", 40)
             run(job, [PY, str(ROOT / "process_images.py"), str(folder), "--top-reviews", "5"], "이미지 가공")
             run(job, [PY, str(ROOT / "process_images.py"), str(folder), "--prepare-crops"], "크롭 준비")
 
-        stage(job, "제품 사진 고르기 — 상세페이지에서 쓸 컷을 추립니다")
+        stage(job, "제품 사진 고르기 — 상세페이지에서 쓸 컷을 추립니다", 48)
         imgpick.prepare(folder, req.get("provider"), req.get("apiKey"),
                         req.get("model"), gen._post, lambda m: log(job, m))
 
-        stage(job, "상세페이지 읽기 — 스펙·인증·구성품을 뽑습니다")
+        stage(job, "상세페이지 읽기 — 스펙·인증·구성품을 뽑습니다", 58)
         specs.prepare(folder, req.get("provider"), req.get("apiKey"),
                       req.get("model"), gen._post, lambda m: log(job, m))
 
-        stage(job, "문구 생성 — AI가 카드 문구를 씁니다")
+        stage(job, "문구 생성 — AI가 카드 문구를 씁니다", 72)
         hook_prompt = next((h["prompt"] for h in HOOK_STYLES if h["id"] == req.get("hook")),
                            HOOK_STYLES[0]["prompt"])
         gen.generate(folder, req["provider"], req["apiKey"], req.get("model") or None,
@@ -177,22 +181,22 @@ def worker(job, req):
                      req.get("persona", "정원"), hook_prompt)
         log(job, "slides.json 작성 완료")
 
-        stage(job, "카드 렌더링 — PNG 만드는 중")
+        stage(job, "카드 렌더링 — PNG 만드는 중", 80)
         run(job, [PY, str(ROOT / "scripts" / "render.py"), str(folder / "slides.json")], "렌더링")
 
         fixes = []
         if req.get("review", True):
-            stage(job, "검수 — 만든 카드를 보고 잘못된 곳을 고칩니다")
+            stage(job, "검수 — 만든 카드를 보고 잘못된 곳을 고칩니다", 90)
             fixes = reviewer.run(folder, req.get("provider"), req.get("apiKey"),
                                  req.get("model"), gen._post, lambda m: log(job, m))
         if fixes:
-            stage(job, f"수정한 {len(fixes)}장 다시 그리는 중")
+            stage(job, f"수정한 {len(fixes)}장 다시 그리는 중", 96)
             run(job, [PY, str(ROOT / "scripts" / "render.py"), str(folder / "slides.json"),
                       "--only", ",".join(str(n) for n in fixes)], "재렌더링")
 
         slides = sorted(folder.glob("slide_*.png"))
         with JOBS_LOCK:
-            JOBS[job].update(done=True, stage="완료",
+            JOBS[job].update(done=True, stage="완료", percent=100,
                              slides=[f.name for f in slides],
                              caption=(folder / "caption.txt").read_text(encoding="utf-8")
                              if (folder / "caption.txt").exists() else "")
@@ -331,7 +335,7 @@ class Handler(BaseHTTPRequestHandler):
                 return self._send(400, {"error": "API 키를 입력해 주세요"})
             job = uuid.uuid4().hex
             with JOBS_LOCK:
-                JOBS[job] = {"stage": "대기 중", "log": [], "done": False,
+                JOBS[job] = {"stage": "대기 중", "percent": 0, "log": [], "done": False,
                              "error": None, "folder": None, "slides": [],
                              "caption": "", "started": datetime.now().isoformat()}
             threading.Thread(target=worker, args=(job, body), daemon=True).start()
