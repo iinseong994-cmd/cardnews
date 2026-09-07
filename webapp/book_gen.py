@@ -174,83 +174,96 @@ RULES = """
 """
 
 
-### 북리뷰 테마 — 8장 구성 #################################################
-# 받은 PPTX 템플릿을 그대로 옮긴 것. 카드마다 들어가는 칸이 정해져 있다.
-# theme 이 "review" 일 때만 이 스키마를 쓴다.
+### 북리뷰 테마 — 10장 구성 ################################################
+# 카드 **모양**은 받은 PPTX 템플릿에서 가져오고,
+# 카드 **순서와 내용**은 우리가 정한 10장 흐름을 따른다.
+# PPT 가 8장이라고 8장으로 만들면 정해둔 흐름이 깨진다.
+#
+# 템플릿이 주는 여덟 가지 모양을 열 자리에 나눠 쓴다.
+#   cover · oneline · ideas · quote · insight · quote · foryou · quote · afterword · closing
 
-SCHEMA_8 = """{
+SCHEMA_10 = """{
   "theme": "review",
   "palette": "<팔레트>",
   "slides": [
-    {"no":1,"type":"cover","kind":"BOOK REVIEW",
-     "eyebrow":"<책을 한 줄로 소개하는 부제. 20~28자>",
-     "headline":"<책 제목 그대로. 길면 \\n 으로 두 줄>",
-     "author":"저자  <지은이>","rating":"<5점 만점 별점>","image_path":"card_images/cover.png"},
+    {"no":1,"type":"cover",
+     "eyebrow":"<이 책이 무엇에 대한 책인지 한 줄. 20~28자>",
+     "headline":"<책 제목 그대로. 길면 \\n 으로 두 줄>"},
 
-    {"no":2,"type":"oneline","kind":"ONE LINE","headline":"이 책을 한 문장으로",
-     "line":"<이 책이 무슨 책인지 한 문장. \\n 으로 2~3줄로 끊는다. 줄당 8~12자>",
+    {"no":2,"type":"oneline","headline":"이 책을 한 문장으로",
+     "line":"<이 책이 무슨 책인지 한 문장. \\n 으로 2~3줄. 줄당 8~12자>",
      "subhead":"<그 문장을 받쳐주는 두 줄>",
      "note":"<작은 상자에 들어갈 짧은 말 두 줄>"},
 
-    {"no":3,"type":"ideas","kind":"KEY IDEAS","headline":"핵심 주제",
-     "points":[{"k":"<주제 한 마디 8~12자>","v":"<한 문장 설명 25~35자>"},
+    {"no":3,"type":"ideas","headline":"이 책이 하는 말",
+     "points":[{"k":"<주제 8~14자>","v":"<한 문장 25~35자>"},
                {"k":"<주제>","v":"<설명>"},
                {"k":"<주제>","v":"<설명>"}]},
 
-    {"no":4,"type":"insight","kind":"INSIGHT",
-     "headline":"<이 책에서 제일 눈에 띄는 대목. \\n 으로 두 줄>",
-     "body":"<그 대목을 풀어 쓴 두 줄>",
-     "callout":"<어두운 상자에 들어갈 문장. \\n 으로 세 줄. 줄당 10~14자>",
-     "close":"<마무리 두 줄>"},
-
-    {"no":5,"type":"quote","kind":"QUOTATION",
-     "line":"<책에서 뽑은 문장. \\n 으로 2~3줄. 원문 그대로>",
+    {"no":4,"type":"quote",
+     "line":"<이 책의 한 문장. \\n 으로 2~3줄. 원문 그대로>",
      "who":"<지은이, 『책 제목』>",
      "subhead":"<그 문장에 대한 두 줄>"},
 
-    {"no":6,"type":"afterword","kind":"MY REVIEW","headline":"<제목 한 줄>",
-     "body":"<두 줄>","body2":"<세 줄>",
-     "close":"<크게 들어갈 마무리. \\n 으로 두 줄. 줄당 8~12자>"},
+    {"no":5,"type":"insight",
+     "headline":"<지은이를 한 마디로. \\n 으로 두 줄>",
+     "body":"<지은이가 어떤 사람인지 두 줄>",
+     "callout":"<어두운 상자에 들어갈 문장. \\n 으로 세 줄. 줄당 10~14자>",
+     "close":"<마무리 두 줄>"},
 
-    {"no":7,"type":"foryou","kind":"FOR YOU","headline":"이런 분께 추천해요",
+    {"no":6,"type":"quote",
+     "line":"<추천사 원문 그대로. 없으면 이 책의 두 번째 문장. \\n 으로 2~3줄>",
+     "who":"<추천한 사람·매체>",
+     "subhead":"<두 줄>"},
+
+    {"no":7,"type":"foryou","headline":"이런 분께 추천해요",
      "points":[{"k":"<어떤 사람인지 앞 구절>","v":"<뒤 구절>"},
                {"k":"<앞 구절>","v":"<뒤 구절>"},
                {"k":"<앞 구절>","v":"<뒤 구절>"}]},
 
-    {"no":8,"type":"closing","kind":"CLOSING",
+    {"no":8,"type":"quote",
+     "line":"<독자 리뷰 원문 그대로. \\n 으로 2~3줄>",
+     "who":"교보문고 구매자",
+     "subhead":"<리뷰 수와 평점을 알려주는 한 줄>"},
+
+    {"no":9,"type":"afterword","headline":"<제목 한 줄>",
+     "body":"<두 줄>","body2":"<세 줄>",
+     "close":"<크게 들어갈 마무리. \\n 으로 두 줄. 줄당 8~12자>"},
+
+    {"no":10,"type":"closing",
      "eyebrow":"<마무리 인사 두 줄>",
      "headline":"<읽는 사람에게 던지는 물음. \\n 으로 두 줄. 물음표로 끝>",
-     "rating":"<5점 만점 별점>",
      "subhead":"<한 줄 안내>"}
   ],
   "caption": "<게시용 캡션. 4~6줄>",
   "hashtags": ["#태그1","#태그2","#태그3","#태그4","#태그5"]
 }"""
 
-RULES_8 = """
+RULES_10 = """
 ## 절대 규칙
 
 1. **숫자·사실은 주어진 책 데이터에서만.** 없는 수상·판매고·순위를 지어내면 허위 표시가 된다.
-2. **5번 인용은 원문 그대로.** 주어진 데이터(책 소개·출판사 리뷰·추천사·MD 한마디) 안에
-   실제로 있는 문장만 쓴다. 다듬거나 지어내면 안 된다. `who` 에 출처를 밝힌다.
+2. **인용(4·6·8번)은 원문 그대로.** 주어진 데이터 안에 실제로 있는 문장만 쓴다.
+   다듬거나 지어내면 안 된다. `who` 에 누가 한 말인지 밝힌다.
+   · 4번 — 책이 하려는 말을 담은 한 문장 (책 소개·출판사 리뷰·MD 한마디에서)
+   · 6번 — 이름 있는 사람·매체의 추천사. **추천사가 없으면 4번과 다른 대목에서 문장을 하나 더** 고른다
+   · 8번 — 독자 리뷰 하나. subhead 에 리뷰 수와 평점을 적는다
 3. **책 본문을 길게 옮기지 않는다.** 한 문장까지다.
-4. **가격을 넣지 않는다.** 책 정보(ISBN·쪽수·판형)도 카드에 쓰지 않는다.
-5. **1번 headline 은 책 제목 그대로**다. 후크는 eyebrow(부제)에 쓴다.
-   부제는 제목을 되풀이하지 말고, 이 책이 무엇에 대한 책인지 한 줄로 알려준다.
+4. **가격·책 정보(ISBN·쪽수·판형)는 카드에 쓰지 않는다.**
+5. **1번 headline 은 책 제목 그대로**다. 후크는 eyebrow 에 쓴다.
    ⭕ "조금 느려도 괜찮은 삶에 대하여" ❌ "베스트셀러 화제작" ← 아무 정보가 없다
-6. **줄 길이를 지켜라.** 이 템플릿은 칸이 정해져 있어 길면 넘친다.
-   · 2번 `line`, 4번 `callout`, 6번 `close`, 8번 `headline` — **줄당 8~14자**, `\\n` 으로 직접 끊는다
+6. **줄 길이를 지켜라.** 칸이 정해진 템플릿이라 길면 넘친다.
+   · 2번 `line`, 5번 `callout`, 9번 `close`, 10번 `headline` — **줄당 8~14자**, `\\n` 으로 직접 끊는다
    · 3번·7번 `k` 는 8~14자, `v` 는 25~35자 한 문장
-7. **카드마다 다른 얘기를 해라.** 3번에서 한 말을 4번에서 또 하지 마라.
-   3번은 이 책이 다루는 주제 세 가지, 4번은 그중 가장 인상적인 대목 하나를 깊이 판다.
-8. **뭉뚱그린 말을 쓰지 마라.**
-   ❌ "감동적인 이야기" ❌ "탄탄한 구성" ❌ "~에 대해 설명한다"
+   · 4·6·8번 `line` 은 2~3줄, 줄당 10~16자
+7. **카드마다 다른 얘기를 해라.** 3번에서 한 말을 5번에서 또 하지 마라.
+8. **책에 대한 설명 말고 책 안의 말을 써라.**
+   ❌ "~를 설명한다" "~를 제시한다" "감동적인 이야기"
    ⭕ 목차의 장 제목, 저자가 겪은 일, 책이 내놓는 구체적인 방법
-9. **6번이 유일하게 사람 목소리가 들어가는 자리다.**
+9. **9번이 유일하게 사람 목소리가 들어가는 자리다.**
    앞 카드가 전부 사실과 인용이라, 여기가 없으면 안내문처럼 읽힌다.
    책을 요약하지 말고 **읽고 나서 무엇이 달라지는지**를 써라.
-10. **8번은 물음으로 닫는다.** "만나보세요" 로 끝나면 거기서 대화가 끝난다.
-    책의 주제를 읽는 사람 자기 이야기로 끌어오는 물음이어야 한다. 물음표로 끝낸다.
+10. **10번은 물음으로 닫는다.** 물음표로 끝낸다.
 11. **JSON만 출력한다.** 설명·코드펜스 없이 `{` 로 시작해 `}` 로 끝낸다.
 """
 
@@ -397,12 +410,12 @@ def build_prompt(brief, reviews, persona_md, hooks_md, theme, palette,
 
 # 출력 형식
 theme 은 "{theme}", palette 는 "{palette}" 로 고정한다.
-{SCHEMA_8 if theme == "review" else SCHEMA}
-{RULES_8 if theme == "review" else RULES}
+{SCHEMA_10 if theme == "review" else SCHEMA}
+{RULES_10 if theme == "review" else RULES}
 
 ## 이 성격에서 달라지는 것
-{"6번" if theme == "review" else "9번"} — {m["s9"]}
-{"8번" if theme == "review" else "10번"} — {m["s10"]}
+9번 — {m["s9"]}
+10번 — {m["s10"]}
 """
 
 
@@ -503,7 +516,7 @@ def five_point(book):
 
 
 def sanitize_review(data, output_dir, book, palette):
-    """북리뷰 테마(8장) 정리. 칸이 정해진 템플릿이라 손볼 게 적다."""
+    """북리뷰 테마(10장) 정리. 칸이 정해진 템플릿이라 손볼 게 적다."""
     output_dir = Path(output_dir)
     data["theme"] = "review"
     data["palette"] = palette
@@ -511,13 +524,13 @@ def sanitize_review(data, output_dir, book, palette):
     has_cover = (output_dir / cover).exists()
     rating = five_point(book)
 
-    kinds = {"cover": "BOOK REVIEW", "oneline": "ONE LINE", "ideas": "KEY IDEAS",
-             "insight": "INSIGHT", "quote": "QUOTATION", "afterword": "MY REVIEW",
-             "foryou": "FOR YOU", "closing": "CLOSING"}
+    # 오른쪽 위 영문 라벨. 같은 모양(quote)을 세 번 쓰므로 **장 번호로** 정한다.
+    KINDS = ["BOOK REVIEW", "ONE LINE", "KEY IDEAS", "QUOTATION", "AUTHOR",
+             "PRAISE", "FOR YOU", "READERS", "MY REVIEW", "CLOSING"]
 
     for i, sl in enumerate(data.get("slides", []), 1):
         sl["no"] = i
-        sl["kind"] = kinds.get(sl.get("type"), sl.get("kind") or "")
+        sl["kind"] = KINDS[i - 1] if i <= len(KINDS) else ""
 
         if sl.get("type") == "cover":
             sl["image_path"] = cover if has_cover else None
@@ -534,6 +547,10 @@ def sanitize_review(data, output_dir, book, palette):
             q = {"text": sl.get("line") or "", "who": sl.get("who") or "책"}
             if not _real_quote(q, book):
                 sl["who"] = ""
+            # 독자 리뷰 장(8번)의 리뷰 수·평점은 AI 를 믿지 않고 크롤 데이터로 적는다
+            if i == 8 and book.get("리뷰수"):
+                sl["subhead"] = "교보문고 리뷰 %s개 · 평점 %s / 5" % (
+                    format(book["리뷰수"], ","), rating or "-")
         elif sl.get("type") in ("ideas", "foryou"):
             sl["points"] = [p for p in (sl.get("points") or []) if (p.get("k") or "").strip()][:3]
 

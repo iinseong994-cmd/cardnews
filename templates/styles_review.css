@@ -24,7 +24,7 @@ mark { background: none; color: var(--accent); }
 /* PPT 는 도형을 겹쳐 놓는 방식이라, HTML 도 칸을 중첩하지 않고 나란히 둔다.
    글자 상자는 PPT 에서 모두 위쪽 정렬(anchor="t")이라 세로 가운데 맞춤을 쓰지 않는다. */
 .cv-book { display: flex; align-items: center; justify-content: center; }
-.cv-book--img { background: none; }
+.cv-book.cv-book--img { background: none; }   /* 자동 생성 규칙보다 세게 */
 .cv-img { max-width: 100%; max-height: 100%; object-fit: contain;
           filter: drop-shadow(0 18px 34px rgba(0,0,0,.28)); }
 
