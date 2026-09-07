@@ -4,6 +4,8 @@
    예) 43.5pt 제목 → 58px. 원본을 고칠 일이 있으면 이 비율을 기억할 것.
    색만 팔레트 6개로 갈아끼운다. 자리는 팔레트와 무관하게 같다. */
 
+/* 색은 원본 PPTX 값 그대로다. 인용 상자(--soft)·메모 상자(--note)는
+   원본이 여섯 테마 모두 같은 베이지를 쓴다. 임의로 바꾸지 않는다. */
 :root {
   --paper:  #F3F0E8;   /* 바탕 */
   --ink:    #17201C;   /* 본문 */
@@ -12,13 +14,11 @@
   --soft:   #E4DDD0;   /* 인용 상자 */
   --note:   #DFD5C6;   /* 작은 메모 상자 */
 }
-body.pal-navy   { --paper:#F5F2EA; --ink:#101B31; --deep:#172B55; --accent:#D94C3D; --soft:#E6E0D2; --note:#E0D9C9; }
-body.pal-cobalt { --paper:#F6F2E8; --ink:#111111; --deep:#1947D1; --accent:#FF6B35; --soft:#E8E4D8; --note:#E2DDCE; }
-body.pal-sepia  { --paper:#EDE3CF; --ink:#33291E; --deep:#70533B; --accent:#6B7651; --soft:#E1D4BB; --note:#DACBB0; }
-body.pal-wine   { --paper:#F3EAE5; --ink:#25191B; --deep:#6C1F32; --accent:#B98282; --soft:#E7D9D3; --note:#E1D0C9; }
-/* 소프트블루는 원본 강조색(#CADDE2)이 바탕과 거의 같아 글씨가 안 보인다.
-   장식에는 그 색을 쓰고, 글씨에는 한 단계 진한 색을 쓴다. */
-body.pal-mist   { --paper:#EEF4F5; --ink:#20282C; --deep:#7397A6; --accent:#4E7C8E; --soft:#DEE9EC; --note:#D6E4E8; }
+body.pal-navy   { --paper:#F5F2EA; --ink:#101B31; --deep:#172B55; --accent:#D94C3D; }
+body.pal-cobalt { --paper:#F6F2E8; --ink:#111111; --deep:#1947D1; --accent:#FF6B35; }
+body.pal-sepia  { --paper:#EDE3CF; --ink:#33291E; --deep:#70533B; --accent:#6B7651; }
+body.pal-wine   { --paper:#F3EAE5; --ink:#25191B; --deep:#6C1F32; --accent:#B98282; }
+body.pal-mist   { --paper:#EEF4F5; --ink:#20282C; --deep:#7397A6; --accent:#CADDE2; }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -78,12 +78,8 @@ mark { background: none; color: var(--accent); }
 .cv-author { float: left; }
 .cv-rating { float: right; color: var(--accent); }
 
-/* 진짜 표지가 있으면 색 블록을 지우고, 세로로 긴 책에 맞춰 칸을 다시 잡는다.
-   원본 칸(580×520)은 가로가 넓어 세로 표지를 넣으면 조그맣게 들어간다. */
-.cv-book--img {
-  left: 340px; top: 415px; width: 400px; height: 620px;
-  background: none;
-}
+/* 진짜 표지가 들어오면 색 블록만 지운다. 칸 자리·크기는 원본 그대로 둔다. */
+.cv-book--img { background: none; }
 
 /* ── 02 한 문장으로 ── */
 .note { position: absolute; left: 650px; top: 1000px; width: 300px; height: 110px;
