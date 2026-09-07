@@ -1,0 +1,86 @@
+[
+  {
+    "id": "forest",
+    "name": "숲속 서재",
+    "desc": "초록 벽에 기댄 책과 들꽃",
+    "preview": "bg_forest.png",
+    "slides": 8
+  },
+  {
+    "id": "metro",
+    "name": "메트로",
+    "desc": "흑백 건축 + 네이비·레드",
+    "preview": "bg_metro.png",
+    "slides": 8
+  },
+  {
+    "id": "pop",
+    "name": "팝 컬러",
+    "desc": "파랑·주황 도형과 책",
+    "preview": "bg_pop.png",
+    "slides": 8
+  },
+  {
+    "id": "antique",
+    "name": "고서",
+    "desc": "낡은 종이와 밀랍 봉인",
+    "preview": "bg_antique.png",
+    "slides": 8
+  },
+  {
+    "id": "velvet",
+    "name": "벨벳",
+    "desc": "와인빛 천과 마른 꽃",
+    "preview": "bg_velvet.png",
+    "slides": 8
+  },
+  {
+    "id": "seaside",
+    "name": "창가",
+    "desc": "흰 꽃이 놓인 바다 창가",
+    "preview": "bg_seaside.png",
+    "slides": 8
+  },
+  {
+    "id": "pine",
+    "name": "침엽수",
+    "desc": "이끼와 전나무 사이의 종이",
+    "preview": "bg_pine.png",
+    "slides": 8
+  },
+  {
+    "id": "citymap",
+    "name": "도시 지도",
+    "desc": "항공 사진과 붉은 원",
+    "preview": "bg_citymap.png",
+    "slides": 8
+  },
+  {
+    "id": "arch",
+    "name": "아치",
+    "desc": "파란 아치와 손에 든 책",
+    "preview": "bg_arch.png",
+    "slides": 8
+  },
+  {
+    "id": "dryflower",
+    "name": "말린 꽃",
+    "desc": "빛바랜 종이와 눌린 꽃",
+    "preview": "bg_dryflower.png",
+    "slides": 8
+  },
+  {
+    "id": "theater",
+    "name": "극장",
+    "desc": "붉은 커튼과 객석",
+    "preview": "bg_theater.png",
+    "slides": 8
+  },
+  {
+    "id": "linen",
+    "name": "린넨",
+    "desc": "흰 커튼 너머 바다",
+    "preview": "bg_linen.png",
+    "slides": 8
+  }
+]
