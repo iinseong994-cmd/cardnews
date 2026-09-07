@@ -66,12 +66,42 @@ Claude가 대신 켤 때는:
 Start-Process "카드뉴스 만들기.bat"
 ```
 
-쿠팡 링크 + 본인 API 키(Gemini 무료 가능)를 넣으면 크롤링 → 이미지 가공 → 문구 생성 → 렌더링까지 한 번에 돈다.
-- 코드: `webapp/server.py`(로컬 서버) · `webapp/ui.html`(화면) · `webapp/gen.py`(문구 생성 프롬프트)
+링크 + 본인 API 키(Gemini 무료 가능)를 넣으면 끝까지 한 번에 돈다.
+**링크를 보고 두 갈래로 갈라진다** (`server.py`의 `is_book_job()`):
+
+| 넣는 것 | 가는 곳 |
+|---|---|
+| `coupang.com` / `link.coupang.com` | 쿠팡 상품 흐름 (기존) |
+| `product.kyobobook.co.kr` · ISBN 13자리 | 교보문고 책 흐름 |
+
+- 코드: `webapp/server.py`(로컬 서버) · `webapp/ui.html`(화면) · `webapp/gen.py`(상품 문구) · `webapp/book_gen.py`(책 문구)
 - 표준 라이브러리만 쓴다 (추가 설치 없음). 포트 8765.
-- 만드는 흐름: 크롤링 → 제품컷 선별 → **상세페이지 스펙 읽기**(2단계 비전) → 문구 생성 → 렌더 → **검수**(만든 카드를 AI가 보고 고친 뒤 그 장만 다시 렌더). 검수는 체크박스로 끌 수 있다.
+- **상품 흐름**: 크롤링 → 제품컷 선별 → **상세페이지 스펙 읽기**(2단계 비전) → 문구 생성 → 렌더 → 검수
+- **책 흐름**: 크롤링 → 표지 카드 만들기 → 문구 생성 → 렌더 → 검수
+  (책은 사진이 표지 한 장뿐이라 제품컷 선별·상세페이지 읽기를 건너뛴다. 그만큼 빠르다)
+- 검수 = 만든 카드를 AI가 보고 고친 뒤 그 장만 다시 렌더. 체크박스로 끌 수 있다.
 - 결과 화면 아래 **디자인 다듬기**: 계정 라벨(@핸들)·제목/본문 크기·좌우 여백·페이지 번호를 조절하고 `1장 미리보기`(2~3초) → `전체 적용`. 값은 slides.json의 `design` 블록에 저장된다 (`scripts/design.py`).
 - **넷리파이 같은 공개 웹으로는 못 만든다** — 쿠팡 크롤링에 로컬 Chrome이 필요하다.
+  (교보문고만 쓴다면 헤드리스로도 되지만, 앱은 둘 다 받으므로 로컬 실행을 유지한다)
+
+### "이 책으로 카드뉴스 만들어줘" (교보문고)
+
+```bash
+python book_crawl.py "https://product.kyobobook.co.kr/detail/S000000610612"
+python book_crawl.py "9788936434120"      # ISBN 도 된다
+python book_crawl.py "소년이 온다"          # 검색어 → 첫 결과
+```
+
+- **Chrome 창이 뜨지 않는다.** 교보는 차단이 없어 헤드리스로 조용히 돈다.
+- 결과: `output/<제목>_<ISBN>/` 에 `book.json` · `book.md` · `cover.jpg`(1200px 원본)
+- 뽑아오는 것: 저자·역자·출판사·출간일·쪽수·판형·ISBN·정가/판매가·평점·리뷰수·분야·키워드,
+  그리고 **책소개 · 수상내역 · MD의 한마디 · 목차 · 작가정보 · 추천사 · 출판사 리뷰 · 교보 AI 리뷰 요약 · 독자 리뷰 원문**
+- 표지 카드: `python webapp/book_images.py "output/<책폴더>"`
+  → 표지를 **자르지 않고** 같은 표지를 흐려 파스텔로 만든 배경 위에 얹는다 (자르면 제목이 날아간다)
+- 책 카드 10장 구성: 표지 → 배경/저자 이야기 → 핵심 → 방법 → 책 정보 → **추천사** → 리뷰 수·평점 → **독자 리뷰** → 이런 분께 → 마무리
+  - **추천사 카드가 책만의 무기다.** 평론가·작가·매체가 한 말이라 상품에는 없는 재료다.
+  - **책 본문은 옮기지 않는다.** 목차의 장 제목 인용은 되지만 본문 문장을 길게 베끼면 저작권 문제가 된다.
+  - 파트너스 고지는 파트너스 링크를 함께 게시할 때만 넣는다 (`book_gen.generate(..., disclosure=...)`).
 
 ### "쿠팡 콘텐츠 만들어줘" / "/make-coupang-contents"
 
@@ -119,6 +149,7 @@ open "output/<제품폴더>/preview.html"   # Windows: start
 
 - 공통 규칙(글 구조·길이·사실성 가드레일)은 `references/persona.md`
 - **후크(표지 문구·첫 줄)는 `references/hooks.md`** — 심리 6분류로 서로 다른 후보를 뽑고, 금지 패턴을 피한다
+- **잡담·일상글(링크 없는 글)은 `references/threads-writing.md`** — 노잼 진단 5가지, 웃김 장치 5가지, 마지막 줄 규칙(반전·자조·툭 끊기)
 - preview.html 상단의 **페르소나 버튼**으로 4개 글을 전환하며 비교 → 마음에 드는 것만 게시
 - 사용자가 "말투 바꿔줘", "내 페르소나로 해줘", "페르소나 추가해줘"라고 하면:
   `references/personas/<이름>.md`를 수정/추가하고 `references/persona.md`의 목록 표 + `scripts/preview.py`의 `PERSONA_META`(핸들·아바타 색)도 함께 갱신한다.
@@ -138,6 +169,7 @@ open "output/<제품폴더>/preview.html"   # Windows: start
 coupang-contents/
 ├── CLAUDE.md              ← 이 파일
 ├── crawl.py               ← 쿠팡 상품 크롤러 (Chrome remote debug)
+├── book_crawl.py          ← 교보문고 책 크롤러 (헤드리스 — 창이 안 뜬다)
 ├── process_images.py      ← 리뷰카드 렌더링 + 이미지 크롭
 ├── pipeline.py            ← crawl + process_images 한 번에
 ├── .claude/skills/
@@ -147,10 +179,12 @@ coupang-contents/
 │   ├── hooks.md           ← 후킹멘트 6분류 + 금지 패턴 (표지 후크·첫 줄)
 │   ├── persona.md         ← 쓰레드 페르소나 공통 규칙 + 6인 목록
 │   └── personas/          ← 페르소나별 목소리 (유진·살까말까·수현·태오·하루·정원)
-├── webapp/                ← 로컬 웹앱 (쿠팡 링크 → 카드뉴스)
-│   ├── server.py          ← 로컬 서버 (표준 라이브러리만)
+├── webapp/                ← 로컬 웹앱 (쿠팡 상품 · 교보문고 책 → 카드뉴스)
+│   ├── server.py          ← 로컬 서버 (표준 라이브러리만). is_book_job() 으로 분기
 │   ├── ui.html            ← 브라우저 화면
-│   └── gen.py             ← 문구 생성 (Gemini/Claude/GPT)
+│   ├── gen.py             ← 상품 문구 생성 (Gemini/Claude/GPT)
+│   ├── book_gen.py        ← 책 문구 생성 (추천사·목차·작가 이야기를 재료로)
+│   └── book_images.py     ← 책 표지 → 카드 이미지 (자르지 않는다)
 ├── 카드뉴스 만들기.bat     ← 더블클릭하면 앱이 켜진다
 ├── templates/             ← 카드뉴스/리뷰카드 HTML 템플릿
 ├── scripts/render.py      ← slides.json → 카드뉴스 PNG 렌더링
@@ -161,6 +195,9 @@ coupang-contents/
 ## 주의사항
 
 - Chrome이 뜨는 건 Akamai 차단 우회를 위한 정상 동작. 크롤링 중 그 브라우저를 직접 조작하지 않기.
+  **교보문고는 예외** — 차단이 없어서 헤드리스로 돈다. 창이 안 뜨는 게 정상이다.
+- 크롤링 결과 폴더는 크롤러가 마지막에 찍는 `RESULT_DIR=` 줄로 알아낸다.
+  수정시각으로 짐작하면 **이미 받아둔 걸 다시 받을 때 엉뚱한 폴더를 집는다.**
 - output/ 폴더는 상품별로 자동 생성됨 (상품명_상품ID)
 - 숫자(가격·리뷰 수·평점)는 절대 지어내지 않는다 — 전부 크롤링 데이터에서.
 - Windows: Chrome이 기본 경로에 없으면 crawl.py 상단 `CHROME_PATH`를 본인 설치 경로로 수정.
