@@ -337,6 +337,9 @@ class Handler(BaseHTTPRequestHandler):
             self.send_response(200)
             self.send_header("Content-Type", ctype)
             self.send_header("Content-Length", str(len(data)))
+            # 카드 파일 이름은 매번 slide_01.png 로 같다.
+            # 이게 없으면 두 번째 만들 때 브라우저가 예전 그림을 꺼내 보여준다.
+            self.send_header("Cache-Control", "no-store, must-revalidate")
             self.end_headers()
             self.wfile.write(data)
             return

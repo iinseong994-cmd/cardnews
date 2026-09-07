@@ -389,9 +389,12 @@ function show(d){
   }
   $("#count").textContent = d.slides.length + "장 · 1080×1350";
   const box = $("#cards"); box.innerHTML = "";
+  // 같은 책을 다시 만들면 폴더도 파일명도 그대로다.
+  // 주소가 똑같으면 브라우저가 예전 그림을 그대로 쓰므로 매번 다른 값을 붙인다.
+  const bust = "&t=" + Date.now();
   d.slides.forEach(n => {
     const img = new Image();
-    img.src = `/api/file?folder=${encodeURIComponent(d.folder)}&name=${encodeURIComponent(n)}`;
+    img.src = `/api/file?folder=${encodeURIComponent(d.folder)}&name=${encodeURIComponent(n)}` + bust;
     img.alt = n;
     img.onclick = () => { $("#lbimg").src = img.src; $("#lb").showModal(); };
     box.appendChild(img);
