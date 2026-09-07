@@ -148,8 +148,14 @@
 
   <section>
     <div class="head"><span class="num">4</span><h2>말투와 후크</h2></div>
-    <label class="lbl">누가 말하나 (페르소나)</label>
-    <div class="grid g3" id="personas"></div>
+    <div id="modewrap">
+      <label class="lbl">카드 성격 <span class="hint">(책일 때만 적용됩니다)</span></label>
+      <div class="grid g2" id="modes"></div>
+    </div>
+    <div id="personawrap">
+      <label class="lbl" style="margin-top:6px">누가 말하나 (페르소나)</label>
+      <div class="grid g3" id="personas"></div>
+    </div>
     <label class="lbl" style="margin-top:6px">표지 후크 방향</label>
     <div class="chips" id="hooks"></div>
     <label class="row" style="gap:7px;font-size:14px;margin-top:4px">
@@ -256,7 +262,8 @@ const PROVIDERS = [
    hint:'OpenAI Platform에서 발급 → <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener">platform.openai.com</a>'},
 ];
 let FOLDER = null;
-const S = {provider:"gemini", theme:"frost", palette:"ice", persona:"정원", hook:"auto"};
+const S = {provider:"gemini", theme:"frost", palette:"ice", persona:"정원",
+           hook:"auto", mode:"review"};
 let CFG = null, JOB = null, TIMER = null;
 
 function pick(container, items, key, render){
@@ -287,9 +294,13 @@ function paint(){
   $("#palwrap").hidden = !(th && th.palettes.length);
   if(th && th.palettes.length) pick($("#palettes"), th.palettes, "palette",
     {cls:"chipbtn", html:p=>p.name});
+  pick($("#modes"), CFG.modes || [], "mode",
+    {cls:"opt", html:m=>`<b>${m.name}</b><span>${m.desc}</span>`});
   pick($("#personas"), CFG.personas, "persona",
     {cls:"opt", html:p=>`<b>${p.name}</b><span>${p.desc||""}</span>`});
   pick($("#hooks"), CFG.hooks, "hook", {cls:"chipbtn", html:h=>h.name});
+  // 홍보형은 출판사 공식 목소리로 쓴다. 페르소나를 고를 일이 없다.
+  $("#personawrap").hidden = (S.mode === "promo");
 }
 
 $("#key").addEventListener("input", e => localStorage.setItem("key_"+S.provider, e.target.value));

@@ -79,22 +79,41 @@ RULES = """
    ⭕ "뼈가 / 30조각" (저자가 사고로 얼굴 뼈 30조각이 났다는 사실)
    ⭕ "6개월 / 만에" (걷지 못하던 사람이 6개월 만에 복귀했다)
    대형 문구는 **한 줄에 2~4자, 최대 2줄.** 길면 잘린다.
-7. **2·3·4번 카드는 서로 다른 각도여야 한다.** 같은 얘기를 두 번 쓰지 마라.
+7. **2·3·4번 카드는 서로 다른 각도여야 한다.**
    고를 수 있는 각도: 이 책이 나온 배경 / 저자가 겪은 일 / 핵심 주장 /
-   책이 제시하는 방법 / 목차에서 보이는 흐름 / 이 책이 받은 평가 / 누가 왜 읽었나
-   `eyebrow` 에 그 각도를 한 단어로 적는다. (예: 시작, 핵심, 방법, 배경)
-8. **bullets 는 형용사만 늘어놓지 말고 확인된 사실이나 구체적인 문장을 쓴다.**
-   ❌ "감동적인 이야기" ❌ "탄탄한 구성" ❌ "깊은 울림"
-   ⭕ "고교 야구선수 시절 동료의 배트에 얼굴을 정통으로 맞았다"
+   책이 내놓는 방법 / 목차에서 보이는 흐름 / 이 책이 받은 평가 / 누가 왜 읽었나
+   `eyebrow` 에 그 각도를 한 단어로 적는다. (예: 시작, 핵심, 방법, 배경, 지은이)
+
+   **같은 사실을 두 카드에 넣지 마라.** 3번에 "부자가 되는 세 가지 방법" 을 썼으면
+   4번에 또 쓰면 안 된다. 3번이 무엇을 다뤘는지 보고 4번은 다른 것을 골라라.
+   쓸 각도가 모자라면 카드 수를 줄이지 말고 **목차를 더 파고들어** 다른 대목을 찾아라.
+8. **bullets 에는 책 "안의 내용" 을 쓴다. 책 "에 대한 설명" 을 쓰지 마라.**
+
+   제일 흔한 실패가 목차를 남의 말로 바꿔 적는 것이다. 이러면 아무 정보가 없다.
+   ❌ "돈을 모으지 못하는 이유를 **설명**" ❌ "부자가 되는 세 가지 방법을 **제시**"
+   ❌ "돈을 다루는 네 가지 능력을 **소개**" ❌ "~에 대해 **강조**" ❌ "~를 **다룸**"
+   → `설명·제시·소개·강조·다룸·언급·분석` 으로 끝나는 줄은 **한 줄도 쓰지 마라.**
+
+   그 자리에 **그 책이 실제로 하는 말**을 넣어라.
+   ⭕ "돈은 인격체다 — 함부로 대하면 떠난다"
    ⭕ "제3법칙 — 쉬워야 한다"
-   목차의 장 제목을 그대로 가져오는 것도 좋다. 그 책만의 말이라 힘이 있다.
-9. **6번은 추천사 카드다.** 평론가·작가·매체가 한 말을 쓴다.
-   추천사가 없으면 출판사 리뷰나 수상 내역에서 가져오고, 그것도 없으면
-   6번을 list 로 바꿔 '이 책이 받은 평가' 를 정리한다.
+   ⭕ "고교 야구선수 시절 동료의 배트에 얼굴을 정통으로 맞았다"
+
+   형용사만 늘어놓는 것도 안 된다.
+   ❌ "감동적인 이야기" ❌ "탄탄한 구성" ❌ "깊은 울림"
+
+   **목차의 장 제목을 그대로 가져오는 게 가장 안전하고 힘이 있다.**
+   그 책만 쓸 수 있는 말이기 때문이다.
+9. **6번은 추천사 카드다.** 평론가·작가·매체처럼 **이름이 있는 누군가가 한 말**을 옮긴다.
+
+   **추천사 데이터가 비어 있으면 6번을 `list` 로 바꿔라.**
+   '이 책이 받은 평가'(수상·쇄수·판매 부수·번역 출간·미디어 소개)를 bullets 로 정리한다.
+   없는 사람의 말을 지어내면 안 되고, `who` 에 "출판사" · "AI 리뷰" 를 적는 것도 안 된다.
+   그건 인용이 아니라 요약문이다. **인용은 누가 했는지 이름을 댈 수 있을 때만 쓴다.**
 10. **8번은 독자 리뷰 카드다.** 서로 다른 얘기를 하는 리뷰 3개를 고른다.
     리뷰가 2개뿐이면 2개만 쓴다. 없으면 8번을 list 로 바꾼다.
-11. **9번은 이 책이 맞는 사람을 쓴다.** 책을 깎는 말은 쓰지 않는다.
-    맞지 않는 사람을 굳이 적어야 한다면 흠이 아니라 **용도 한정**으로 쓴다.
+11. **책을 깎는 말은 쓰지 않는다.** (9번·10번이 어떤 카드인지는 맨 아래 성격별 지침을 따른다)
+    한계를 굳이 적어야 한다면 흠이 아니라 **용도 한정**으로 쓴다.
     (예: "이론을 더 알고 싶은 분보다, 오늘 당장 할 한 가지를 찾는 분께 맞습니다")
 12. **분량을 채운다.** 카드가 비어 보이면 안 된다.
     - `list` 의 bullets 는 **4개**, 각 한 문장 (25~45자)
@@ -104,6 +123,51 @@ RULES = """
     - 모든 list 카드에 `subhead` 를 한 줄 넣는다
 13. **JSON만 출력한다.** 설명·코드펜스 없이 `{` 로 시작해 `}` 로 끝낸다.
 """
+
+
+### 카드 성격 ############################################################
+# 같은 책이라도 **누가 올리느냐**에 따라 말이 달라져야 한다.
+#   review — 읽은 사람이 남에게 권한다 (개인 계정·파트너스)
+#   promo  — 만든 사람이 자기 책을 알린다 (출판사 공식 계정)
+# 구조(10장)는 같고 목소리와 몇 장의 성격만 바뀐다.
+
+MODES = {
+    "review": {
+        "name": "리뷰형",
+        "voice": "(아래 페르소나의 목소리로 쓴다)",
+        "stance": """너는 **이 책을 읽고 남에게 권하는 사람**이다.
+출판사가 아니라 독자 편에 서서 쓴다. 좋았던 점을 말하되 광고처럼 들리면 안 된다.""",
+        "s9": """9번은 **이 책이 맞는 사람**을 고른다.
+읽는 사람이 '나 얘기네' 하고 멈추게 만드는 문장이어야 한다.""",
+        "s10": """10번은 링크로 넘긴다. 예: "링크는 첫 댓글에 두겠습니다 👇" """,
+    },
+    "promo": {
+        "name": "홍보형",
+        "voice": """**출판사 공식 계정의 목소리**로 쓴다.
+· 담백한 존댓말. 차분하고 자신 있게. 호들갑스러운 감탄사·이모지 남발 금지
+· '저희가 만든 책' 이라는 자리에서 말한다. 독자인 척하지 않는다
+· 파는 말('강추', '지금 사세요')이 아니라 **알리는 말**을 쓴다""",
+        "stance": """너는 **이 책을 만든 출판사**다. 자기 책을 세상에 알리는 카드뉴스를 쓴다.
+읽는 사람에게 '이런 책이 나왔고, 왜 지금 이 책인지' 를 전한다.
+
+홍보형에서 특히 살릴 것 — 이게 출판사가 가진 무기다
+  · **왜 지금 이 책인가** (책이 답하려는 물음, 나온 배경)
+  · **지은이가 누구인가** (경력·이력이 곧 신뢰다)
+  · **이미 받은 평가** (수상·쇄수·판매 부수·번역 출간·미디어 소개)
+  · **목차로 보여주는 알맹이** (무엇이 들어 있는지 구체적으로)
+
+절대 하지 않는 것
+  · 다른 책과 비교하거나 깎아내리기
+  · '최고의' '유일한' '단 하나의' 같은 단정 — 데이터에 있는 사실만
+  · 독자 리뷰를 출판사가 쓴 것처럼 섞기""",
+        "s9": """9번은 **이 책이 놓이면 좋을 자리**를 쓴다.
+소비자 상담 톤('이런 분께 맞아요')이 아니라, 어떤 순간에 이 책이 쓰이는지를 적는다.
+예: "돈을 벌기 시작한 20대에게 첫 책으로" · "매년 초에 다시 펴보는 책으로" """,
+        "s10": """10번은 **어디서 만날 수 있는지**로 맺는다.
+예: "전국 서점과 온라인에서 만나보실 수 있습니다"
+출판사 이름을 chips 에 넣는다.""",
+    },
+}
 
 
 def _clip(text, n):
@@ -143,6 +207,15 @@ def book_brief(b):
         if body:
             L += ["", "## " + head, "", body]
 
+    # 없는 재료는 없다고 분명히 말해준다. 안 그러면 그럴듯하게 지어낸다.
+    missing = [h for h, key in (("추천사", "추천사"), ("목차", "목차"),
+                                ("작가 정보", "작가정보"), ("수상·미디어 추천", "수상내역"))
+               if not (b.get(key) or "").strip()]
+    if missing:
+        L += ["", "## 이 책에 없는 것", "",
+              "다음 자료는 **이 책에 없다.** 없는 것을 지어내지 말고 카드 구성을 바꿔라:",
+              "- " + "\n- ".join(missing)]
+
     if b.get("ai요약제목"):
         L += ["", "## 교보 AI 리뷰 요약", "",
               "제목: " + b["ai요약제목"], _clip(b.get("ai요약"), 600)]
@@ -158,12 +231,18 @@ def reviews_text(b):
     return "\n".join("- " + r["text"] for r in rv)
 
 
-def build_prompt(brief, reviews, persona_md, hooks_md, theme, palette, hook_style):
+def build_prompt(brief, reviews, persona_md, hooks_md, theme, palette,
+                 hook_style, mode="review"):
+    m = MODES.get(mode, MODES["review"])
+    voice = persona_md if mode == "review" else m["voice"]
     return f"""너는 책 카드뉴스의 문구를 쓰는 사람이다.
 아래 책 데이터와 규칙을 읽고 slides.json 을 만들어라.
 
-# 페르소나 (이 목소리로 쓴다)
-{persona_md}
+# 이 카드뉴스의 성격 — {m["name"]}
+{m["stance"]}
+
+# 목소리
+{voice}
 
 # 후킹멘트 규칙
 {hooks_md}
@@ -181,6 +260,10 @@ def build_prompt(brief, reviews, persona_md, hooks_md, theme, palette, hook_styl
 theme 은 "{theme}", palette 는 "{palette}" 로 고정한다.
 {SCHEMA}
 {RULES}
+
+## 이 성격에서 달라지는 것
+9번 — {m["s9"]}
+10번 — {m["s10"]}
 """
 
 
@@ -191,6 +274,37 @@ def review_headline(b):
     if not n:
         return None
     return f"리뷰 **{n:,}개**" + (f" · 평점 **{r}**" if r else "")
+
+
+# 인용한 사람 자리에 이런 말이 오면 그건 인용이 아니라 요약이다.
+# ('교보문고 구매자' 는 진짜 독자 리뷰라서 여기 넣으면 안 된다)
+FAKE_WHO = ("출판사", "ai ", "ai리뷰", "ai 리뷰", "리뷰 요약",
+            "책 소개", "소개글", "미상", "익명", "편집부")
+
+
+def _real_quote(q, book):
+    """정말 누가 한 말을 옮긴 것인지 본다.
+
+    · who 가 사람·매체 이름이어야 한다 ('출판사' · 'AI 리뷰' 는 아니다)
+    · 그 문장이 크롤링해온 원문 안에 실제로 있어야 한다
+      (앞·중간 두 곳을 본다. 인용하며 앞머리를 조금 자르는 일이 있어서다)
+    """
+    who = (q.get("who") or "").strip()
+    text = (q.get("text") or "").strip()
+    if not who or not text:
+        return False
+    w = who.lower()
+    if any(bad in w for bad in FAKE_WHO) or w == "ai":
+        return False
+
+    hay = re.sub(r"\s+", "", " ".join(
+        [str(book.get(k) or "") for k in ("추천사", "출판사서평", "책소개", "작가정보")]
+        + [r.get("text", "") for r in (book.get("리뷰") or [])]))
+    t = re.sub(r"\s+", "", text)
+    if len(t) < 8:
+        return False
+    probes = [t[:12], t[len(t) // 2: len(t) // 2 + 12]]
+    return any(p and p in hay for p in probes)
 
 
 def sanitize(data, output_dir, book, theme, palette, disclosure=""):
@@ -214,8 +328,12 @@ def sanitize(data, output_dir, book, theme, palette, disclosure=""):
                 sl["image_path"] = "card_images/cover.jpg"
 
         if sl.get("type") == "photo":
-            if not sl.get("image_path") and (output_dir / "card_images" / "wide.jpg").exists():
+            # 사진 카드의 사진 칸과 표지 칸은 비율이 다르다.
+            # cover.jpg(세로 940×1536)를 사진 카드에 넣으면 위아래가 잘려 제목이 날아간다.
+            if (output_dir / "card_images" / "wide.jpg").exists():
                 sl["image_path"] = "card_images/wide.jpg"
+            elif sl.get("image_path", "").endswith("cover.jpg"):
+                sl["image_path"] = None
             if not sl.get("image_path"):
                 sl["type"] = "list"            # 사진이 없으면 글자 카드로
 
@@ -234,6 +352,23 @@ def sanitize(data, output_dir, book, theme, palette, disclosure=""):
         if sl.get("type") == "quotes" and not sl.get("quotes"):
             sl["type"] = "list"
 
+        # 없는 사람 말을 인용하지 않는다.
+        # 추천사가 비어 있는 책인데도 quotes 카드를 만들고
+        # who 에 "출판사" · "AI 리뷰" 를 적어 넣은 적이 있다. 인용이 아니라 요약문이다.
+        if sl.get("type") == "quotes":
+            keep = [q for q in sl["quotes"] if _real_quote(q, book)]
+            if len(keep) < 2:
+                sl["type"] = "list"
+                sl["bullets"] = [q.get("text", "") for q in sl["quotes"] if q.get("text")][:4]
+                sl.pop("quotes", None)
+                # 인용이 아니게 됐는데 제목만 '추천사' 로 남으면 말이 안 맞는다
+                if re.search(r"추천사|먼저 읽|이 사람들", sl.get("headline") or ""):
+                    sl["headline"] = "이 책이\n받은 평가"
+                if not sl.get("subhead"):
+                    sl["subhead"] = "책 소개와 출판사 자료에서 옮겼습니다"
+            else:
+                sl["quotes"] = keep
+
         fixed.append(sl)
 
     data["slides"] = fixed
@@ -245,7 +380,7 @@ def sanitize(data, output_dir, book, theme, palette, disclosure=""):
 # ── 실행 ────────────────────────────────────────────────────
 
 def generate(output_dir, provider, api_key, model, theme, palette,
-             persona, hook_style, disclosure=""):
+             persona, hook_style, disclosure="", mode="review"):
     output_dir = Path(output_dir)
     bf = output_dir / "book.json"
     if not bf.exists():
@@ -258,7 +393,7 @@ def generate(output_dir, provider, api_key, model, theme, palette,
         else "(페르소나 없음 — 담백한 존댓말로 쓴다)"
 
     prompt = build_prompt(book_brief(book), reviews_text(book),
-                          persona_md, hooks_md, theme, palette, hook_style)
+                          persona_md, hooks_md, theme, palette, hook_style, mode)
 
     fn = gen.PROVIDERS.get(provider)
     if not fn:

@@ -99,6 +99,13 @@ HOOK_STYLES = [
 ]
 
 
+# 책 카드뉴스의 성격 (쿠팡 상품에는 안 쓴다)
+BOOK_MODES = [
+    {"id": "review", "name": "리뷰형", "desc": "읽은 사람이 권하는 말투 · 개인 계정용"},
+    {"id": "promo", "name": "홍보형", "desc": "출판사 공식 계정 말투 · 저자·수상·목차 중심"},
+]
+
+
 def personas():
     d = ROOT / "references" / "personas"
     out = []
@@ -197,7 +204,8 @@ def prepare_book(job, req):
     book_gen.generate(folder, req["provider"], req["apiKey"], req.get("model") or None,
                       req.get("theme", "frost"), req.get("palette", "ice"),
                       req.get("persona", "정원"), hook_prompt,
-                      disclosure=req.get("disclosure", ""))
+                      disclosure=req.get("disclosure", ""),
+                      mode=req.get("mode", "review"))
     log(job, "slides.json 작성 완료")
     return folder
 
@@ -318,7 +326,8 @@ class Handler(BaseHTTPRequestHandler):
 
         if u.path == "/api/config":
             return self._send(200, {"themes": THEMES, "personas": personas(),
-                                    "hooks": HOOK_STYLES, "setupError": SETUP_ERROR})
+                                    "hooks": HOOK_STYLES, "modes": BOOK_MODES,
+                                    "setupError": SETUP_ERROR})
 
         if u.path == "/api/status":
             job = q.get("job", [""])[0]

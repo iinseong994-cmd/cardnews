@@ -16,8 +16,12 @@ from pathlib import Path
 from PIL import Image, ImageFilter, ImageEnhance
 
 COVER_BOX = (940, 1536)     # 표지 슬라이드 칸 (실제 470×768 의 2배)
-WIDE_BOX = (1080, 1350)     # 전면 사진 카드
+WIDE_BOX = (1080, 1050)     # 사진 카드의 사진 칸 (.bleed) — 카드 전체 높이가 아니다
 MARGIN = 0.86               # 칸 안에서 표지가 차지할 비율
+
+# ⚠️ WIDE_BOX 는 styles_frost.css 의 `.bleed` 크기와 같아야 한다.
+#    1350(카드 전체 높이)으로 만들면 background-size:cover 가 위아래를 잘라서
+#    책 제목이 날아간다. 테마 CSS 에서 .bleed 를 고치면 여기도 같이 고칠 것.
 
 
 def _backdrop(img, size, blur=52, wash=0.62, sat=0.55):
@@ -71,7 +75,7 @@ def _compose(cover, box, margin=MARGIN, center_y=0.5):
 # 이름 → (칸 크기, 표지가 차지할 비율, 세로 위치)
 VARIANTS = {
     "cover.jpg": (COVER_BOX, 0.86, 0.50),
-    "wide.jpg":  (WIDE_BOX,  0.62, 0.34),   # 아래 1/3 은 글자 띠가 덮는다
+    "wide.jpg":  (WIDE_BOX,  0.84, 0.50),
 }
 
 
