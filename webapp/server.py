@@ -83,9 +83,16 @@ JOBS_LOCK = threading.Lock()
 THEMES = [
     # 책 전용 — 8장 구성. 팔레트 6개는 받은 PPTX 템플릿에서 그대로 옮겼다.
     {"id": "review", "name": "북리뷰", "desc": "편집 잡지풍 8장 구성 · 책 전용",
-     "palettes": [{"id": "", "name": "포레스트"}, {"id": "navy", "name": "네이비"},
-                  {"id": "cobalt", "name": "코발트"}, {"id": "sepia", "name": "세피아"},
-                  {"id": "wine", "name": "버건디"}, {"id": "mist", "name": "소프트블루"}]},
+     # preview 가 있으면 화면이 이름 대신 실제로 그려본 카드를 보여준다.
+     # 그림은 scripts/make_theme_previews.py 로 만든다.
+     "palettes": [
+         {"id": "", "name": "포레스트 에디토리얼", "preview": "review_default.png"},
+         {"id": "navy", "name": "네이비 매거진", "preview": "review_navy.png"},
+         {"id": "cobalt", "name": "코발트 모던", "preview": "review_cobalt.png"},
+         {"id": "sepia", "name": "세피아 아카이브", "preview": "review_sepia.png"},
+         {"id": "wine", "name": "버건디 문학", "preview": "review_wine.png"},
+         {"id": "mist", "name": "소프트블루 미니멀", "preview": "review_mist.png"},
+     ]},
     {"id": "frost", "name": "프로스트", "desc": "얼음빛 바탕 + 알약 라벨 + 큰 타이포",
      "palettes": [{"id": "ice", "name": "아이스 블루"}, {"id": "sage", "name": "세이지 그린"}]},
     {"id": "bold", "name": "볼드", "desc": "딥잉크 전면 + 풀블리드 사진", "palettes": []},
@@ -339,6 +346,20 @@ class Handler(BaseHTTPRequestHandler):
             with JOBS_LOCK:
                 j = JOBS.get(job)
                 return self._send(200, dict(j) if j else {"error": "없는 작업"})
+
+        if u.path.startswith("/preview/"):
+            name = Path(u.path[len("/preview/"):]).name      # 경로 타고 올라가기 차단
+            f = (WEBAPP / "previews" / name).resolve()
+            if not str(f).startswith(str((WEBAPP / "previews").resolve())) or not f.exists():
+                return self._send(404, {"error": "없는 파일"})
+            data = f.read_bytes()
+            self.send_response(200)
+            self.send_header("Content-Type", "image/png")
+            self.send_header("Content-Length", str(len(data)))
+            self.send_header("Cache-Control", "no-store")
+            self.end_headers()
+            self.wfile.write(data)
+            return
 
         if u.path == "/api/file":
             folder = q.get("folder", [""])[0]
