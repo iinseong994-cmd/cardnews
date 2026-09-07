@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>쿠팡 카드뉴스 만들기</title>
+<title>카드뉴스 만들기</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
 <style>
   :root{
@@ -114,16 +114,17 @@
   <div class="err" id="setuperr" hidden style="margin-bottom:4px"></div>
 
   <header>
-    <span class="badge">내 컴퓨터에서 실행 · 쿠팡 데이터 그대로</span>
-    <h1>쿠팡 링크 하나로<br><em>카드뉴스가 완성됩니다</em></h1>
-    <p class="lede">링크를 넣으면 상품을 크롤링해서 가격·평점·리뷰·상세 스펙을 가져오고, 그 데이터로만 문구를 써서 카드 10장을 만듭니다. 숫자를 지어내지 않습니다.</p>
+    <span class="badge">내 컴퓨터에서 실행 · 크롤링한 데이터 그대로</span>
+    <h1>링크 하나로<br><em>카드뉴스가 완성됩니다</em></h1>
+    <p class="lede">쿠팡 상품이면 가격·평점·리뷰·상세 스펙을, 교보문고 책이면 저자·목차·추천사·독자 리뷰를 가져와서 그 데이터로만 문구를 씁니다. 숫자를 지어내지 않습니다.</p>
   </header>
 
   <section>
-    <div class="head"><span class="num">1</span><h2>쿠팡 상품 링크</h2>
-      <span class="note">파트너스 링크도 OK</span></div>
-    <input type="text" id="url" placeholder="https://www.coupang.com/vp/products/... 또는 https://link.coupang.com/a/...">
-    <p class="hint">크롤링 중에 <b>Chrome 창이 하나 뜹니다. 정상이니 건드리지 마세요.</b> 쿠팡 차단을 우회하려고 진짜 브라우저를 씁니다.</p>
+    <div class="head"><span class="num">1</span><h2>상품 링크 또는 책 링크</h2>
+      <span class="note">파트너스 링크 · ISBN 도 OK</span></div>
+    <input type="text" id="url" placeholder="쿠팡 https://link.coupang.com/a/…　│　교보 https://product.kyobobook.co.kr/detail/…">
+    <p class="hint"><b>쿠팡</b>은 크롤링 중에 <b>Chrome 창이 하나 뜹니다. 정상이니 건드리지 마세요.</b> 쿠팡 차단을 우회하려고 진짜 브라우저를 씁니다.<br>
+      <b>교보문고</b>는 창이 뜨지 않고 조용히 돌아갑니다. 링크 대신 <b>ISBN 13자리</b>를 넣어도 됩니다.</p>
   </section>
 
   <section>
@@ -307,7 +308,7 @@ paint();
 $("#go").onclick = async () => {
   const url = $("#url").value.trim();
   const apiKey = $("#key").value.trim();
-  if(!url) return alert("쿠팡 상품 링크를 넣어주세요.");
+  if(!url) return alert("쿠팡 상품 링크나 교보문고 책 링크를 넣어주세요.");
   if(!apiKey) return alert("API 키를 넣어주세요. 위 안내 링크에서 무료로 받을 수 있습니다.");
   const model = PROVIDERS.find(p=>p.id===S.provider).model;
   start({url, apiKey, model, review: $("#doreview").checked, ...S});

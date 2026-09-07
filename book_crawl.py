@@ -428,6 +428,9 @@ def main():
         print("  %-14s %5d자%s" % (head, n, "" if n else "   ← 없음"))
     print("  독자리뷰 %d건" % len(data["리뷰"]))
     print("\n  저장 → %s" % folder)
+    # 서버가 결과 폴더를 확실히 알 수 있게.
+    # 수정시각으로 짐작하면 이미 받아둔 책을 다시 받을 때 엉뚱한 폴더를 집는다.
+    print("RESULT_DIR=" + str(folder.resolve()))
 
 
 if __name__ == "__main__":

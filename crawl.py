@@ -584,6 +584,9 @@ def main():
 
         save_results(product_info, image_files, reviews, output_dir)
         print(f"\n완료! 결과: {output_dir}/")
+        # 서버가 결과 폴더를 확실히 알 수 있게.
+        # 수정시각으로 짐작하면 이미 있던 폴더를 다시 받을 때 엉뚱한 걸 집는다.
+        print("RESULT_DIR=" + str(output_dir.resolve()))
 
     finally:
         # Chrome 종료 (우리가 직접 띄운 경우만)

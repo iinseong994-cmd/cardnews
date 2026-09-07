@@ -39,6 +39,20 @@ import images as imgpick  # noqa: E402
 import specs  # noqa: E402
 import review as reviewer  # noqa: E402
 import update as updater  # noqa: E402
+import book_gen  # noqa: E402
+import book_images  # noqa: E402
+
+
+# 교보문고 링크 / ISBN 이면 책 흐름으로 간다. 쿠팡 흐름은 그대로 둔다.
+BOOK_HOST = re.compile(r"(product|search)\.kyobobook\.co\.kr", re.I)
+ISBN_ONLY = re.compile(r"^\s*97[89][\d-]{10,14}\s*$")
+
+
+def is_book_job(req):
+    if req.get("folder"):
+        return (OUTPUT / req["folder"] / "book.json").exists()
+    u = req.get("url") or ""
+    return bool(BOOK_HOST.search(u) or ISBN_ONLY.match(u))
 
 def setup_problem():
     """설치가 안 됐으면 사람이 읽을 수 있는 안내를 돌려준다. 정상이면 None."""
@@ -118,13 +132,31 @@ def run(job, cmd, label):
     p = subprocess.Popen(cmd, cwd=str(ROOT), stdout=subprocess.PIPE,
                          stderr=subprocess.STDOUT, text=True,
                          encoding="utf-8", errors="replace", bufsize=1)
+    lines = []
     for line in p.stdout:
         line = line.rstrip()
         if line:
             log(job, line)
+            lines.append(line)
     p.wait()
     if p.returncode != 0:
         raise RuntimeError(f"{label} 실패 (코드 {p.returncode})")
+    return lines
+
+
+def result_dir(lines, before):
+    """크롤러가 알려준 결과 폴더. 못 찾으면 예전 방식(수정시각)으로 넘어간다.
+
+    ⚠️ 수정시각 추측은 **이미 받아둔 걸 다시 받을 때 틀린다.**
+       그 폴더는 '새로 생긴 폴더' 가 아니어서, 마침 더 최근에 손댄
+       다른 폴더를 집어 엉뚱한 상품의 카드가 나온 적이 있다.
+    """
+    for line in reversed(lines or []):
+        if line.startswith("RESULT_DIR="):
+            d = Path(line.split("=", 1)[1].strip())
+            if d.exists():
+                return d
+    return newest_output(before)
 
 
 def newest_output(before):
@@ -135,11 +167,48 @@ def newest_output(before):
     return max(dirs, key=lambda d: d.stat().st_mtime) if dirs else None
 
 
+def prepare_book(job, req):
+    """교보문고 링크 → book.json → 표지 카드 → slides.json. 폴더를 돌려준다."""
+    if req.get("folder"):
+        folder = (OUTPUT / req["folder"]).resolve()
+        if not str(folder).startswith(str(OUTPUT.resolve())) or not folder.exists():
+            raise RuntimeError("책 폴더를 찾지 못했습니다")
+        log(job, f"크롤링 건너뜀 — 기존 폴더 사용: {folder.name}")
+        with JOBS_LOCK:
+            JOBS[job].update(folder=folder.name, percent=40)
+    else:
+        before = {d for d in OUTPUT.iterdir() if d.is_dir()}
+        stage(job, "교보문고에서 책 정보 가져오는 중", 8)
+        lines = run(job, [PY, str(ROOT / "book_crawl.py"), req["url"]], "책 크롤링")
+        folder = result_dir(lines, before)
+        if not folder:
+            raise RuntimeError("크롤링 결과 폴더를 찾지 못했습니다")
+        with JOBS_LOCK:
+            JOBS[job].update(folder=folder.name, percent=45)
+        log(job, f"책 폴더: {folder.name}")
+
+    stage(job, "표지 카드 만드는 중", 55)
+    made = book_images.build_book_images(folder)
+    log(job, f"표지 이미지 {len(made)}장" if made else "표지 파일이 없습니다 — 글자 카드로만 만듭니다")
+
+    stage(job, "문구 생성 — AI가 카드 문구를 씁니다", 68)
+    hook_prompt = next((h["prompt"] for h in HOOK_STYLES if h["id"] == req.get("hook")),
+                       HOOK_STYLES[0]["prompt"])
+    book_gen.generate(folder, req["provider"], req["apiKey"], req.get("model") or None,
+                      req.get("theme", "frost"), req.get("palette", "ice"),
+                      req.get("persona", "정원"), hook_prompt,
+                      disclosure=req.get("disclosure", ""))
+    log(job, "slides.json 작성 완료")
+    return folder
+
+
 def worker(job, req):
     try:
         OUTPUT.mkdir(exist_ok=True)
 
-        if req.get("folder"):
+        if is_book_job(req):
+            folder = prepare_book(job, req)
+        elif req.get("folder"):
             # 크롤링 건너뛰기 — 이미 받아둔 상품 폴더 재사용
             folder = (OUTPUT / req["folder"]).resolve()
             if not str(folder).startswith(str(OUTPUT.resolve())) or not folder.exists():
@@ -152,9 +221,10 @@ def worker(job, req):
         else:
             before = {d for d in OUTPUT.iterdir() if d.is_dir()}
             stage(job, "크롤링 — Chrome 창이 뜹니다. 건드리지 마세요", 5)
-            run(job, [PY, str(ROOT / "crawl.py"), req["url"], "--max-review-pages", "1"], "크롤링")
+            lines = run(job, [PY, str(ROOT / "crawl.py"), req["url"],
+                              "--max-review-pages", "1"], "크롤링")
 
-            folder = newest_output(before)
+            folder = result_dir(lines, before)
             if not folder:
                 raise RuntimeError("크롤링 결과 폴더를 찾지 못했습니다")
             with JOBS_LOCK:
@@ -165,21 +235,23 @@ def worker(job, req):
             run(job, [PY, str(ROOT / "process_images.py"), str(folder), "--top-reviews", "5"], "이미지 가공")
             run(job, [PY, str(ROOT / "process_images.py"), str(folder), "--prepare-crops"], "크롭 준비")
 
-        stage(job, "제품 사진 고르기 — 상세페이지에서 쓸 컷을 추립니다", 48)
-        imgpick.prepare(folder, req.get("provider"), req.get("apiKey"),
-                        req.get("model"), gen._post, lambda m: log(job, m))
+        if not is_book_job(req):
+            # 여기부터는 상품 전용 — 책은 사진이 표지 한 장뿐이라 고를 것도, 읽을 상세페이지도 없다
+            stage(job, "제품 사진 고르기 — 상세페이지에서 쓸 컷을 추립니다", 48)
+            imgpick.prepare(folder, req.get("provider"), req.get("apiKey"),
+                            req.get("model"), gen._post, lambda m: log(job, m))
 
-        stage(job, "상세페이지 읽기 — 스펙·인증·구성품을 뽑습니다", 58)
-        specs.prepare(folder, req.get("provider"), req.get("apiKey"),
-                      req.get("model"), gen._post, lambda m: log(job, m))
+            stage(job, "상세페이지 읽기 — 스펙·인증·구성품을 뽑습니다", 58)
+            specs.prepare(folder, req.get("provider"), req.get("apiKey"),
+                          req.get("model"), gen._post, lambda m: log(job, m))
 
-        stage(job, "문구 생성 — AI가 카드 문구를 씁니다", 72)
-        hook_prompt = next((h["prompt"] for h in HOOK_STYLES if h["id"] == req.get("hook")),
-                           HOOK_STYLES[0]["prompt"])
-        gen.generate(folder, req["provider"], req["apiKey"], req.get("model") or None,
-                     req.get("theme", "frost"), req.get("palette", "ice"),
-                     req.get("persona", "정원"), hook_prompt)
-        log(job, "slides.json 작성 완료")
+            stage(job, "문구 생성 — AI가 카드 문구를 씁니다", 72)
+            hook_prompt = next((h["prompt"] for h in HOOK_STYLES if h["id"] == req.get("hook")),
+                               HOOK_STYLES[0]["prompt"])
+            gen.generate(folder, req["provider"], req["apiKey"], req.get("model") or None,
+                         req.get("theme", "frost"), req.get("palette", "ice"),
+                         req.get("persona", "정원"), hook_prompt)
+            log(job, "slides.json 작성 완료")
 
         stage(job, "카드 렌더링 — PNG 만드는 중", 80)
         run(job, [PY, str(ROOT / "scripts" / "render.py"), str(folder / "slides.json")], "렌더링")
@@ -329,8 +401,13 @@ class Handler(BaseHTTPRequestHandler):
             if SETUP_ERROR:
                 return self._send(400, {"error": SETUP_ERROR})
             url = (body.get("url") or "").strip()
-            if not body.get("folder") and not re.search(r"(coupang\.com|link\.coupang\.com)", url):
-                return self._send(400, {"error": "쿠팡 상품 링크가 아닙니다"})
+            known = (re.search(r"coupang\.com", url) or is_book_job(body))
+            if not body.get("folder") and not known:
+                return self._send(400, {"error":
+                    "알아볼 수 없는 링크입니다.\n\n"
+                    "· 쿠팡 상품 링크 (coupang.com / link.coupang.com)\n"
+                    "· 교보문고 책 링크 (product.kyobobook.co.kr)\n"
+                    "· 또는 ISBN 13자리"})
             if not body.get("apiKey"):
                 return self._send(400, {"error": "API 키를 입력해 주세요"})
             job = uuid.uuid4().hex
@@ -349,7 +426,7 @@ def main():
     srv = ThreadingHTTPServer(("127.0.0.1", PORT), Handler)
     url = f"http://127.0.0.1:{PORT}/"
     print("=" * 52)
-    print("  쿠팡 카드뉴스 만들기")
+    print("  카드뉴스 만들기 — 쿠팡 상품 · 교보문고 책")
     print("=" * 52)
     if SETUP_ERROR:
         print()
@@ -359,7 +436,9 @@ def main():
     print(f"  브라우저가 열립니다 → {url}")
     print("  끄려면 이 창을 닫으세요.")
     print("=" * 52)
-    threading.Timer(1.0, lambda: webbrowser.open(url)).start()
+    # CARDNEWS_NO_BROWSER=1 이면 브라우저를 안 연다 (자동 점검용)
+    if not os.environ.get("CARDNEWS_NO_BROWSER"):
+        threading.Timer(1.0, lambda: webbrowser.open(url)).start()
     try:
         srv.serve_forever()
     except KeyboardInterrupt:
