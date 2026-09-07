@@ -93,6 +93,9 @@ def build_css(cover_path):
   -webkit-background-clip: text; background-clip: text;
 }}
 .band {{ border-top-color: var(--line); }}
+/* 페이지 번호는 테마에 파란색이 박혀 있어서 따로 맞춰준다 */
+.page, .page--float, .page--onphoto {{ color: {ink2}; opacity: .62; }}
+.disclosure {{ color: {ink2}; }}
 """
 
 

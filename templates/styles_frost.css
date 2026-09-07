@@ -187,7 +187,21 @@ mark { background: none; color: var(--accent); }
 }
 .quotes li p { font-size: 33px; font-weight: 600; line-height: 1.48; }
 .quotes li span { display: block; margin-top: 14px; font-size: 24px; font-weight: 500; color: var(--ink-2); }
-.quotes--1 li p { font-size: 46px; line-height: 1.45; }
+/* 인용이 하나뿐이면 그 문장이 카드의 주인공이다.
+   작은 흰 상자에 넣으면 리뷰 조각처럼 보여서 힘이 빠진다. */
+.quotes--1 li {
+  background: none; border: none; box-shadow: none; padding: 0;
+}
+.quotes--1 li::before {
+  content: "\201C";
+  display: block; margin: -30px 0 -14px -8px;
+  font-size: 200px; line-height: .78; font-weight: 900;
+  color: var(--accent-2); opacity: .5;
+}
+.quotes--1 li p {
+  font-size: 60px; font-weight: 800; line-height: 1.4; letter-spacing: -.03em;
+}
+.quotes--1 li span { margin-top: 40px; font-size: 27px; }
 
 /* ── CTA ── */
 .cta { text-align: center; top: 45%; }
