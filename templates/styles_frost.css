@@ -172,6 +172,11 @@ mark { background: none; color: var(--accent); }
 }
 .pad .sub { font-size: 28px; font-weight: 500; color: var(--ink-2); line-height: 1.6; margin-bottom: 36px; }
 
+/* ── 한 문장으로 못 박는 카드 ── */
+/* 목록 없이 문장 하나만 있는 카드다. 68px 로는 카드가 비어 보인다. */
+.slide--statement .sec { font-size: 92px; line-height: 1.18; margin-bottom: 40px; }
+.slide--statement .pad .sub { font-size: 32px; }
+
 /* ── 리뷰 카드 이미지 ── */
 .review-img {
   display: block; width: 100%;

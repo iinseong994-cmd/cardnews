@@ -31,7 +31,8 @@ DEFAULTS = {
 THEMES = {
     "frost": {
         "pad": ".pad",
-        "title": {".sec": 68, ".cta h1": 84, ".slide--cover .mega": 152, ".band h2": 50},
+        "title": {".sec": 68, ".cta h1": 84, ".slide--cover .mega": 152, ".band h2": 50,
+                  ".slide--statement .sec": 92},
         "body": {".list li": 38, ".spec dd": 36, ".spec dt": 30, ".quotes li p": 33,
                  ".quotes--1 li p": 46, ".band .sub": 26, ".pad .sub": 28,
                  ".slide--cover .mega-sub": 31},
