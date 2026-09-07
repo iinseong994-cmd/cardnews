@@ -1,18 +1,12 @@
-/* ── 리뷰 테마 — 1080×1350, 8장 구성 (PPTX 템플릿을 옮긴 것) ──────────────
-   자리·크기는 원본 PPTX 에서 그대로 떴다.
-   PPTX 는 pt, 여기는 px 이라 **pt × 4/3** 으로 환산했다 (96dpi 기준).
-   예) 43.5pt 제목 → 58px. 원본을 고칠 일이 있으면 이 비율을 기억할 것.
-   색만 팔레트 6개로 갈아끼운다. 자리는 팔레트와 무관하게 같다. */
+/* ── 북리뷰 테마 — PPTX 템플릿에서 자동으로 뽑은 CSS ──────────────────
+   ⚠️ 이 파일을 직접 고치지 마라. 다음 명령으로 다시 만든다.
+        python scripts/build_review_css.py
+   원본: templates/source/book_review_cardnews_6themes.pptx
+   자리·크기·글자 크기·색은 전부 그 PPT 에서 읽은 값이다 (pt × 4/3 = px). */
 
-/* 색은 원본 PPTX 값 그대로다. 인용 상자(--soft)·메모 상자(--note)는
-   원본이 여섯 테마 모두 같은 베이지를 쓴다. 임의로 바꾸지 않는다. */
 :root {
-  --paper:  #F3F0E8;   /* 바탕 */
-  --ink:    #17201C;   /* 본문 */
-  --deep:   #173F31;   /* 큰 글씨·블록 */
-  --accent: #A14938;   /* 강조 한 점 */
-  --soft:   #E4DDD0;   /* 인용 상자 */
-  --note:   #DFD5C6;   /* 작은 메모 상자 */
+  --paper:  #F3F0E8; --ink: #17201C; --deep: #173F31;
+  --accent: #A14938; --soft: #E4DDD0; --note: #DFD5C6;
 }
 body.pal-navy   { --paper:#F5F2EA; --ink:#101B31; --deep:#172B55; --accent:#D94C3D; }
 body.pal-cobalt { --paper:#F6F2E8; --ink:#111111; --deep:#1947D1; --accent:#FF6B35; }
@@ -21,124 +15,106 @@ body.pal-wine   { --paper:#F3EAE5; --ink:#25191B; --deep:#6C1F32; --accent:#B982
 body.pal-mist   { --paper:#EEF4F5; --ink:#20282C; --deep:#7397A6; --accent:#CADDE2; }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
-
 body {
   font-family: 'Pretendard Variable', Pretendard, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
-  -webkit-font-smoothing: antialiased;
-  color: var(--ink);
+  -webkit-font-smoothing: antialiased; color: var(--ink);
 }
-
-.slide {
-  position: relative; width: 1080px; height: 1350px; overflow: hidden;
-  background: var(--paper);
-}
-
+.slide { position: relative; width: 1080px; height: 1350px; overflow: hidden; background: var(--paper); }
 mark { background: none; color: var(--accent); }
-
-/* ── 머리말·꼬리말 ── */
-.hdr { position: absolute; left: 58px; right: 58px; top: 38px; height: 28px; }
-.hdr-no   { float: left;  font-size: 15px; font-weight: 700; letter-spacing: .04em; }
-.hdr-kind { float: right; font-size: 14px; font-weight: 700; letter-spacing: .16em; }
-.rule-top { position: absolute; left: 58px; top: 76px; width: 964px; height: 2px; background: var(--ink); }
-.rule-bot { position: absolute; left: 58px; top: 1270px; width: 964px; height: 1px; background: var(--ink); opacity: .5; }
-.foot { position: absolute; left: 58px; top: 1290px; font-size: 12px; letter-spacing: .1em; opacity: .75; }
-
-/* ── 공통 조각 ── */
-.sec {
-  position: absolute; left: 76px; top: 135px; width: 900px;
-  font-size: 58px; font-weight: 800; line-height: 1.28; letter-spacing: -.03em;
-}
-.sec--tall { top: 130px; }
-.body { position: absolute; left: 150px; top: 810px; width: 760px;
-        font-size: 23px; font-weight: 500; line-height: 1.72; }
-.rule-short  { position: absolute; left: 150px; top: 760px; width: 150px; height: 3px; background: var(--ink); }
-.rule-accent { position: absolute; left: 76px;  top: 445px; width: 180px; height: 5px; background: var(--accent); }
-.rule-mid    { position: absolute; left: 440px; top: 665px; width: 200px; height: 3px; background: var(--ink); }
-
-.mark { position: absolute; left: 70px; top: 296px;
-        font-size: 84px; font-weight: 800; color: var(--accent); line-height: 1; }
-.big  { position: absolute; left: 150px; top: 365px; width: 790px;
-        font-size: 64px; font-weight: 800; line-height: 1.34; letter-spacing: -.035em;
-        color: var(--deep); }
-
-/* ── 01 표지 ── */
-.cv-sub   { position: absolute; left: 76px; top: 128px; width: 820px;
-            font-size: 22px; font-weight: 500; line-height: 1.5; }
-.cv-title { position: absolute; left: 76px; top: 205px; width: 900px;
-            font-size: 76px; font-weight: 800; line-height: 1.2; letter-spacing: -.04em;
-            color: var(--deep); }
-.cv-book  { position: absolute; left: 250px; top: 470px; width: 580px; height: 520px;
-            display: flex; align-items: center; justify-content: center;
-            background: var(--deep); }
-.cv-img   { max-width: 100%; max-height: 100%; object-fit: contain;
-            filter: drop-shadow(0 18px 34px rgba(0,0,0,.28)); }
-.cv-book-title { font-size: 50px; font-weight: 800; color: var(--paper);
-                 text-align: center; line-height: 1.3; padding: 0 40px; }
-.cv-meta { position: absolute; left: 76px; right: 76px; top: 1060px; font-size: 21px; font-weight: 700; }
-.cv-author { float: left; }
-.cv-rating { float: right; color: var(--accent); }
-
-/* 진짜 표지가 들어오면 색 블록만 지운다. 칸 자리·크기는 원본 그대로 둔다. */
+/* PPT 는 도형을 겹쳐 놓는 방식이라, HTML 도 칸을 중첩하지 않고 나란히 둔다.
+   글자 상자는 PPT 에서 모두 위쪽 정렬(anchor="t")이라 세로 가운데 맞춤을 쓰지 않는다. */
+.cv-book { display: flex; align-items: center; justify-content: center; }
 .cv-book--img { background: none; }
+.cv-img { max-width: 100%; max-height: 100%; object-fit: contain;
+          filter: drop-shadow(0 18px 34px rgba(0,0,0,.28)); }
 
-/* ── 02 한 문장으로 ── */
-.note { position: absolute; left: 650px; top: 1000px; width: 300px; height: 110px;
-        background: var(--note); display: flex; align-items: center; justify-content: center; }
-.note span { font-size: 22px; font-weight: 600; text-align: center; line-height: 1.5; }
 
-/* ── 03 핵심 주제 · 07 이런 분께 ── */
-.rows { position: absolute; left: 76px; top: 340px; width: 900px; list-style: none; }
-.rows li { position: relative; height: 225px; }
-.dot {
-  position: absolute; left: 0; top: 8px; width: 70px; height: 70px; border-radius: 50%;
-  background: var(--deep); color: var(--paper);
-  font-size: 22px; font-weight: 800;
-  display: flex; align-items: center; justify-content: center;
-}
-.rowtext { position: absolute; left: 104px; width: 720px; top: 0; }
-.rowtext h3 { font-size: 28px; font-weight: 800; line-height: 1.4; letter-spacing: -.02em; }
-.rowtext p  { margin-top: 12px; font-size: 19px; font-weight: 500; line-height: 1.6; opacity: .82; }
-.rows li::after {
-  content: ""; position: absolute; left: 104px; top: 130px;
-  width: 720px; height: 1px; background: var(--ink); opacity: .45;
-}
-.rows li:last-child::after { display: none; }
+/* ── slide 01 ── */
+.hdr-no { position: absolute; left: 58px; top: 38px; width: 80px; font-size: 15px; font-weight: 800; color: var(--ink); line-height: 1.62; letter-spacing: -.01em; }
+.hdr-kind { position: absolute; left: 760px; top: 38px; width: 260px; font-size: 14px; font-weight: 800; color: var(--ink); text-align: right; line-height: 1.62; letter-spacing: -.01em; }
+.rule-top { position: absolute; left: 58px; top: 76px; width: 964px; height: 2px; background: var(--ink); }
+.cv-sub { position: absolute; left: 76px; top: 128px; width: 820px; font-size: 22px; font-weight: 500; color: var(--ink); line-height: 1.62; letter-spacing: -.01em; }
+.cv-title { position: absolute; left: 76px; top: 215px; width: 900px; font-size: 76px; font-weight: 800; color: var(--deep); line-height: 1.32; letter-spacing: -.03em; }
+.cv-book { position: absolute; left: 250px; top: 470px; width: 580px; height: 520px; background: var(--deep); }
+.cv-book-title { position: absolute; left: 295px; top: 555px; width: 490px; font-size: 50px; font-weight: 800; color: var(--paper); text-align: center; line-height: 1.32; letter-spacing: -.03em; }
+.cv-dot { position: absolute; left: 460px; top: 735px; width: 160px; height: 160px; background: var(--paper); border-radius: 50%; }
+.cv-author { position: absolute; left: 76px; top: 1060px; width: 420px; font-size: 21px; font-weight: 800; color: var(--ink); line-height: 1.62; letter-spacing: -.01em; }
+.cv-rating { position: absolute; left: 700px; top: 1060px; width: 300px; font-size: 21px; font-weight: 800; color: var(--accent); text-align: right; line-height: 1.62; letter-spacing: -.01em; }
+.foot { position: absolute; left: 58px; top: 1290px; width: 500px; font-size: 12px; font-weight: 500; color: var(--ink); line-height: 1.62; letter-spacing: -.01em; }
+.rule-bot { position: absolute; left: 58px; top: 1270px; width: 964px; height: 1px; background: var(--ink); }
 
-/* ── 04 인상적인 내용 ── */
-.body--lead { left: 76px; top: 500px; width: 760px; font-size: 24px; line-height: 1.75; }
-.callout {
-  position: absolute; left: 620px; top: 690px; width: 350px; height: 270px;
-  background: var(--deep); display: flex; align-items: center;
-  padding: 0 44px;
-}
-.callout p { font-size: 28px; font-weight: 800; line-height: 1.5; color: var(--paper); letter-spacing: -.02em; }
-.strong { position: absolute; left: 76px; top: 1030px; width: 700px;
-          font-size: 27px; font-weight: 800; line-height: 1.5; letter-spacing: -.02em; }
+/* ── slide 02 ── */
+.slide--oneline .sec { position: absolute; left: 76px; top: 135px; width: 900px; font-size: 58px; font-weight: 800; color: var(--ink); line-height: 1.32; letter-spacing: -.03em; }
+.mark { position: absolute; left: 70px; top: 330px; width: 120px; font-size: 84px; font-weight: 800; color: var(--accent); line-height: 1.32; letter-spacing: -.03em; }
+.big { position: absolute; left: 150px; top: 365px; width: 790px; font-size: 64px; font-weight: 800; color: var(--deep); line-height: 1.32; letter-spacing: -.03em; }
+.rule-short { position: absolute; left: 150px; top: 760px; width: 150px; height: 3px; background: var(--ink); }
+.body { position: absolute; left: 150px; top: 810px; width: 760px; font-size: 23px; font-weight: 500; color: var(--ink); line-height: 1.62; letter-spacing: -.01em; }
+.note { position: absolute; left: 650px; top: 1000px; width: 300px; height: 110px; background: var(--note); }
+.note-text { position: absolute; left: 680px; top: 1020px; width: 240px; font-size: 22px; font-weight: 500; color: var(--ink); text-align: center; line-height: 1.62; letter-spacing: -.01em; }
 
-/* ── 05 인용 ── */
+/* ── slide 03 ── */
+.slide--ideas .sec { position: absolute; left: 76px; top: 135px; width: 900px; font-size: 58px; font-weight: 800; color: var(--ink); line-height: 1.32; letter-spacing: -.03em; }
+.slide--ideas .r1-dot { position: absolute; left: 76px; top: 350px; width: 70px; height: 70px; background: var(--deep); border-radius: 50%; }
+.slide--ideas .r1-num { position: absolute; left: 76px; top: 365px; width: 70px; font-size: 22px; font-weight: 800; color: var(--paper); text-align: center; line-height: 1.62; letter-spacing: -.01em; }
+.slide--ideas .r1-h { position: absolute; left: 180px; top: 348px; width: 720px; font-size: 28px; font-weight: 800; color: var(--ink); line-height: 1.62; letter-spacing: -.01em; }
+.slide--ideas .r1-p { position: absolute; left: 180px; top: 398px; width: 720px; font-size: 19px; font-weight: 500; color: var(--ink); line-height: 1.62; letter-spacing: -.01em; }
+.slide--ideas .r1-line { position: absolute; left: 180px; top: 470px; width: 720px; height: 1px; background: var(--ink); }
+.slide--ideas .r2-dot { position: absolute; left: 76px; top: 575px; width: 70px; height: 70px; background: var(--deep); border-radius: 50%; }
+.slide--ideas .r2-num { position: absolute; left: 76px; top: 590px; width: 70px; font-size: 22px; font-weight: 800; color: var(--paper); text-align: center; line-height: 1.62; letter-spacing: -.01em; }
+.slide--ideas .r2-h { position: absolute; left: 180px; top: 573px; width: 720px; font-size: 28px; font-weight: 800; color: var(--ink); line-height: 1.62; letter-spacing: -.01em; }
+.slide--ideas .r2-p { position: absolute; left: 180px; top: 623px; width: 720px; font-size: 19px; font-weight: 500; color: var(--ink); line-height: 1.62; letter-spacing: -.01em; }
+.slide--ideas .r2-line { position: absolute; left: 180px; top: 695px; width: 720px; height: 1px; background: var(--ink); }
+.slide--ideas .r3-dot { position: absolute; left: 76px; top: 800px; width: 70px; height: 70px; background: var(--deep); border-radius: 50%; }
+.slide--ideas .r3-num { position: absolute; left: 76px; top: 815px; width: 70px; font-size: 22px; font-weight: 800; color: var(--paper); text-align: center; line-height: 1.62; letter-spacing: -.01em; }
+.slide--ideas .r3-h { position: absolute; left: 180px; top: 798px; width: 720px; font-size: 28px; font-weight: 800; color: var(--ink); line-height: 1.62; letter-spacing: -.01em; }
+.slide--ideas .r3-p { position: absolute; left: 180px; top: 848px; width: 720px; font-size: 19px; font-weight: 500; color: var(--ink); line-height: 1.62; letter-spacing: -.01em; }
+.slide--ideas .r3-line { position: absolute; left: 180px; top: 920px; width: 720px; height: 1px; background: var(--ink); }
+
+/* ── slide 04 ── */
+.slide--insight .sec { position: absolute; left: 76px; top: 135px; width: 900px; font-size: 58px; font-weight: 800; color: var(--ink); line-height: 1.32; letter-spacing: -.03em; }
+.rule-accent { position: absolute; left: 76px; top: 445px; width: 180px; height: 5px; background: var(--accent); }
+.body--lead { position: absolute; left: 76px; top: 500px; width: 720px; font-size: 24px; font-weight: 500; color: var(--ink); line-height: 1.62; letter-spacing: -.01em; }
+.callout { position: absolute; left: 620px; top: 690px; width: 350px; height: 270px; background: var(--deep); }
+.callout-text { position: absolute; left: 665px; top: 745px; width: 260px; font-size: 28px; font-weight: 800; color: var(--paper); line-height: 1.62; letter-spacing: -.01em; }
+.strong { position: absolute; left: 76px; top: 1030px; width: 700px; font-size: 27px; font-weight: 800; color: var(--ink); line-height: 1.62; letter-spacing: -.01em; }
+
+/* ── slide 05 ── */
 .qbox { position: absolute; left: 88px; top: 205px; width: 900px; height: 760px; background: var(--soft); }
-.mark--in { left: 47px; top: 20px; font-size: 86px; }
-.big--in  { left: 87px; top: 185px; width: 710px; color: var(--ink); }
-.rule-short--in { left: 87px; top: 565px; background: var(--deep); }
-.who { position: absolute; left: 87px; top: 615px; width: 620px; font-size: 21px; font-weight: 600; }
-.body--foot { left: 76px; top: 1050px; width: 700px; font-size: 22px; }
+.mark--in { position: absolute; left: 135px; top: 260px; width: 100px; font-size: 86px; font-weight: 800; color: var(--accent); line-height: 1.32; letter-spacing: -.03em; }
+.big--in { position: absolute; left: 175px; top: 390px; width: 710px; font-size: 64px; font-weight: 800; color: var(--ink); line-height: 1.32; letter-spacing: -.03em; }
+.rule-short--in { position: absolute; left: 175px; top: 770px; width: 150px; height: 3px; background: var(--deep); }
+.who { position: absolute; left: 175px; top: 820px; width: 620px; font-size: 21px; font-weight: 500; color: var(--ink); line-height: 1.62; letter-spacing: -.01em; }
+.body--foot { position: absolute; left: 76px; top: 1050px; width: 700px; font-size: 22px; font-weight: 500; color: var(--ink); line-height: 1.62; letter-spacing: -.01em; }
 
-/* ── 06 읽고 난 뒤 ── */
-.body--wide  { left: 76px; top: 350px; width: 850px; font-size: 26px; line-height: 1.75; }
-.rule-accent--mid { top: 520px; width: 140px; height: 4px; background: var(--deep); }
-.body--wide2 { left: 76px; top: 590px; width: 850px; font-size: 26px; line-height: 1.75; }
-.sign { position: absolute; left: 420px; top: 930px; width: 500px; text-align: right;
-        font-size: 40px; font-weight: 800; line-height: 1.42; letter-spacing: -.03em; color: var(--deep); }
+/* ── slide 06 ── */
+.slide--afterword .sec { position: absolute; left: 76px; top: 135px; width: 900px; font-size: 58px; font-weight: 800; color: var(--ink); line-height: 1.32; letter-spacing: -.03em; }
+.body--wide { position: absolute; left: 76px; top: 350px; width: 850px; font-size: 26px; font-weight: 500; color: var(--ink); line-height: 1.62; letter-spacing: -.01em; }
+.rule-accent--mid { position: absolute; left: 76px; top: 520px; width: 140px; height: 4px; background: var(--deep); }
+.body--wide2 { position: absolute; left: 76px; top: 590px; width: 850px; font-size: 26px; font-weight: 500; color: var(--ink); line-height: 1.62; letter-spacing: -.01em; }
+.sign { position: absolute; left: 420px; top: 930px; width: 500px; font-size: 40px; font-weight: 800; color: var(--deep); text-align: right; line-height: 1.32; letter-spacing: -.03em; }
 
-/* ── 08 마무리 ── */
-.cl-lead  { position: absolute; left: 130px; top: 150px; width: 820px; text-align: center;
-            font-size: 24px; font-weight: 500; line-height: 1.6; }
-.cl-ask   { position: absolute; left: 100px; top: 350px; width: 880px; text-align: center;
-            font-size: 60px; font-weight: 800; line-height: 1.34; letter-spacing: -.035em;
-            color: var(--deep); }
-.cl-stars { position: absolute; left: 180px; top: 745px; width: 720px; text-align: center;
-            font-size: 64px; font-weight: 800; color: var(--deep); letter-spacing: .1em; }
-.cl-score { position: absolute; left: 360px; top: 890px; width: 360px; text-align: center;
-            font-size: 56px; font-weight: 800; }
-.cl-foot  { position: absolute; left: 170px; top: 1110px; width: 740px; text-align: center;
-            font-size: 20px; font-weight: 500; opacity: .85; }
+/* ── slide 07 ── */
+.slide--foryou .sec { position: absolute; left: 76px; top: 135px; width: 900px; font-size: 58px; font-weight: 800; color: var(--ink); line-height: 1.32; letter-spacing: -.03em; }
+.slide--foryou .r1-dot { position: absolute; left: 76px; top: 340px; width: 70px; height: 70px; background: var(--deep); border-radius: 50%; }
+.slide--foryou .r1-num { position: absolute; left: 76px; top: 355px; width: 70px; font-size: 22px; font-weight: 800; color: var(--paper); text-align: center; line-height: 1.62; letter-spacing: -.01em; }
+.slide--foryou .r1-h { position: absolute; left: 180px; top: 338px; width: 720px; font-size: 28px; font-weight: 800; color: var(--ink); line-height: 1.62; letter-spacing: -.01em; }
+.slide--foryou .r1-p { position: absolute; left: 180px; top: 388px; width: 720px; font-size: 19px; font-weight: 500; color: var(--ink); line-height: 1.62; letter-spacing: -.01em; }
+.slide--foryou .r1-line { position: absolute; left: 180px; top: 460px; width: 720px; height: 1px; background: var(--ink); }
+.slide--foryou .r2-dot { position: absolute; left: 76px; top: 575px; width: 70px; height: 70px; background: var(--deep); border-radius: 50%; }
+.slide--foryou .r2-num { position: absolute; left: 76px; top: 590px; width: 70px; font-size: 22px; font-weight: 800; color: var(--paper); text-align: center; line-height: 1.62; letter-spacing: -.01em; }
+.slide--foryou .r2-h { position: absolute; left: 180px; top: 573px; width: 720px; font-size: 28px; font-weight: 800; color: var(--ink); line-height: 1.62; letter-spacing: -.01em; }
+.slide--foryou .r2-p { position: absolute; left: 180px; top: 623px; width: 720px; font-size: 19px; font-weight: 500; color: var(--ink); line-height: 1.62; letter-spacing: -.01em; }
+.slide--foryou .r2-line { position: absolute; left: 180px; top: 695px; width: 720px; height: 1px; background: var(--ink); }
+.slide--foryou .r3-dot { position: absolute; left: 76px; top: 810px; width: 70px; height: 70px; background: var(--deep); border-radius: 50%; }
+.slide--foryou .r3-num { position: absolute; left: 76px; top: 825px; width: 70px; font-size: 22px; font-weight: 800; color: var(--paper); text-align: center; line-height: 1.62; letter-spacing: -.01em; }
+.slide--foryou .r3-h { position: absolute; left: 180px; top: 808px; width: 720px; font-size: 28px; font-weight: 800; color: var(--ink); line-height: 1.62; letter-spacing: -.01em; }
+.slide--foryou .r3-p { position: absolute; left: 180px; top: 858px; width: 720px; font-size: 19px; font-weight: 500; color: var(--ink); line-height: 1.62; letter-spacing: -.01em; }
+.slide--foryou .r3-line { position: absolute; left: 180px; top: 930px; width: 720px; height: 1px; background: var(--ink); }
+
+/* ── slide 08 ── */
+.cl-lead { position: absolute; left: 130px; top: 150px; width: 820px; font-size: 24px; font-weight: 500; color: var(--ink); text-align: center; line-height: 1.62; letter-spacing: -.01em; }
+.cl-ask { position: absolute; left: 100px; top: 360px; width: 880px; font-size: 60px; font-weight: 800; color: var(--deep); text-align: center; line-height: 1.32; letter-spacing: -.03em; }
+.rule-mid { position: absolute; left: 440px; top: 665px; width: 200px; height: 3px; background: var(--ink); }
+.cl-stars { position: absolute; left: 180px; top: 765px; width: 720px; font-size: 64px; font-weight: 800; color: var(--deep); text-align: center; line-height: 1.32; letter-spacing: -.03em; }
+.cl-score { position: absolute; left: 360px; top: 900px; width: 360px; font-size: 56px; font-weight: 800; color: var(--ink); text-align: center; line-height: 1.32; letter-spacing: -.03em; }
+.cl-foot { position: absolute; left: 170px; top: 1110px; width: 740px; font-size: 20px; font-weight: 500; color: var(--ink); text-align: center; line-height: 1.62; letter-spacing: -.01em; }
