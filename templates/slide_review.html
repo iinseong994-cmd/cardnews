@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ slide.headline }}</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+  <link rel="stylesheet" href="{{ css_path }}">
+  {% if design_css %}<style>{{ design_css }}</style>{% endif %}
+</head>
+<body class="pal-{{ palette }}">
+  {% macro rich(text) -%}
+    {%- for line in (text or '').split('\n') -%}
+      {%- set parts = line.split('**') -%}
+      {%- for p in parts -%}
+        {%- if loop.index0 % 2 == 1 -%}<mark>{{ p }}</mark>{%- else -%}{{ p }}{%- endif -%}
+      {%- endfor -%}
+      {%- if not loop.last %}<br>{% endif -%}
+    {%- endfor -%}
+  {%- endmacro %}
+
+  {# 별점 — 4.5 면 ★★★★☆ #}
+  {% macro stars(v) -%}
+    {%- set full = (v | float) | int -%}
+    {%- set half = 1 if (v | float) - full >= 0.25 else 0 -%}
+    {%- for i in range(full) %}★{% endfor -%}
+    {%- if half %}☆{% endif -%}
+    {%- for i in range(5 - full - half) %}☆{% endfor -%}
+  {%- endmacro %}
+
+  <div class="slide slide--{{ slide.type }}">
+
+    {# ── 머리말: 번호 · 영문 라벨 · 가로줄 ── #}
+    <div class="hdr">
+      <span class="hdr-no">{{ '%02d' % slide.no }}</span>
+      <span class="hdr-kind">{{ slide.kind or '' }}</span>
+    </div>
+    <div class="rule-top"></div>
+
+    {# ── 01 표지 ── #}
+    {% if slide.type == 'cover' %}
+      {% if slide.eyebrow %}<p class="cv-sub">{{ slide.eyebrow }}</p>{% endif %}
+      <h1 class="cv-title">{{ rich(slide.headline) }}</h1>
+      {# 진짜 표지가 있으면 색 블록 대신 표지를 세로로 크게 놓는다 #}
+      <div class="cv-book{% if slide.image_path %} cv-book--img{% endif %}">
+        {% if slide.image_path %}
+          <img class="cv-img" src="{{ slide.image_path }}" alt="">
+        {% else %}
+          <span class="cv-book-title">{{ slide.book_title or slide.headline }}</span>
+        {% endif %}
+      </div>
+      <div class="cv-meta">
+        <span class="cv-author">{{ slide.author or '' }}</span>
+        {% if slide.rating %}<span class="cv-rating">별점 {{ slide.rating }} / 5</span>{% endif %}
+      </div>
+
+    {# ── 02 한 문장으로 ── #}
+    {% elif slide.type == 'oneline' %}
+      <h2 class="sec">{{ rich(slide.headline) }}</h2>
+      <div class="mark">“</div>
+      <p class="big">{{ rich(slide.line) }}</p>
+      <div class="rule-short"></div>
+      {% if slide.subhead %}<p class="body">{{ rich(slide.subhead) }}</p>{% endif %}
+      {% if slide.note %}<div class="note"><span>{{ rich(slide.note) }}</span></div>{% endif %}
+
+    {# ── 03 핵심 주제 · 07 이런 분께 ── #}
+    {% elif slide.type in ('ideas', 'foryou') %}
+      <h2 class="sec">{{ rich(slide.headline) }}</h2>
+      <ol class="rows">
+        {% for it in slide.points %}
+          <li>
+            <span class="dot">{{ '✓' if slide.type == 'foryou' else loop.index }}</span>
+            <div class="rowtext">
+              <h3>{{ rich(it.k) }}</h3>
+              {% if it.v %}<p>{{ it.v }}</p>{% endif %}
+            </div>
+          </li>
+        {% endfor %}
+      </ol>
+
+    {# ── 04 인상적인 내용 ── #}
+    {% elif slide.type == 'insight' %}
+      <h2 class="sec sec--tall">{{ rich(slide.headline) }}</h2>
+      <div class="rule-accent"></div>
+      {% if slide.body %}<p class="body body--lead">{{ rich(slide.body) }}</p>{% endif %}
+      {% if slide.callout %}<div class="callout"><p>{{ rich(slide.callout) }}</p></div>{% endif %}
+      {% if slide.close %}<p class="strong">{{ rich(slide.close) }}</p>{% endif %}
+
+    {# ── 05 인용 ── #}
+    {% elif slide.type == 'quote' %}
+      <div class="qbox">
+        <div class="mark mark--in">“</div>
+        <p class="big big--in">{{ rich(slide.line) }}</p>
+        <div class="rule-short rule-short--in"></div>
+        {% if slide.who %}<p class="who">— {{ slide.who }}</p>{% endif %}
+      </div>
+      {% if slide.subhead %}<p class="body body--foot">{{ rich(slide.subhead) }}</p>{% endif %}
+
+    {# ── 06 읽고 난 뒤 ── #}
+    {% elif slide.type == 'afterword' %}
+      <h2 class="sec">{{ rich(slide.headline) }}</h2>
+      {% if slide.body %}<p class="body body--wide">{{ rich(slide.body) }}</p>{% endif %}
+      <div class="rule-accent rule-accent--mid"></div>
+      {% if slide.body2 %}<p class="body body--wide2">{{ rich(slide.body2) }}</p>{% endif %}
+      {% if slide.close %}<p class="sign">{{ rich(slide.close) }}</p>{% endif %}
+
+    {# ── 08 마무리 ── #}
+    {% elif slide.type == 'closing' %}
+      {% if slide.eyebrow %}<p class="cl-lead">{{ rich(slide.eyebrow) }}</p>{% endif %}
+      <h2 class="cl-ask">{{ rich(slide.headline) }}</h2>
+      <div class="rule-mid"></div>
+      {% if slide.rating %}
+        <p class="cl-stars">{{ stars(slide.rating) }}</p>
+        <p class="cl-score">{{ slide.rating }} / 5</p>
+      {% endif %}
+      {% if slide.subhead %}<p class="cl-foot">{{ slide.subhead }}</p>{% endif %}
+
+    {# ── 그 밖 ── #}
+    {% else %}
+      <h2 class="sec">{{ rich(slide.headline) }}</h2>
+      {% if slide.bullets %}
+        <ol class="rows">
+          {% for b in slide.bullets %}
+            <li><span class="dot">{{ loop.index }}</span>
+              <div class="rowtext"><h3>{{ b }}</h3></div></li>
+          {% endfor %}
+        </ol>
+      {% endif %}
+      {% if slide.subhead %}<p class="body">{{ rich(slide.subhead) }}</p>{% endif %}
+    {% endif %}
+
+    <div class="rule-bot"></div>
+    <div class="foot">{{ label or slide.brand or '' }}</div>
+  </div>
+</body>
+</html>

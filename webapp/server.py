@@ -81,6 +81,11 @@ JOBS = {}
 JOBS_LOCK = threading.Lock()
 
 THEMES = [
+    # 책 전용 — 8장 구성. 팔레트 6개는 받은 PPTX 템플릿에서 그대로 옮겼다.
+    {"id": "review", "name": "북리뷰", "desc": "편집 잡지풍 8장 구성 · 책 전용",
+     "palettes": [{"id": "", "name": "포레스트"}, {"id": "navy", "name": "네이비"},
+                  {"id": "cobalt", "name": "코발트"}, {"id": "sepia", "name": "세피아"},
+                  {"id": "wine", "name": "버건디"}, {"id": "mist", "name": "소프트블루"}]},
     {"id": "frost", "name": "프로스트", "desc": "얼음빛 바탕 + 알약 라벨 + 큰 타이포",
      "palettes": [{"id": "ice", "name": "아이스 블루"}, {"id": "sage", "name": "세이지 그린"}]},
     {"id": "bold", "name": "볼드", "desc": "딥잉크 전면 + 풀블리드 사진", "palettes": []},

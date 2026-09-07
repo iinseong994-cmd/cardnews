@@ -174,6 +174,87 @@ RULES = """
 """
 
 
+### 북리뷰 테마 — 8장 구성 #################################################
+# 받은 PPTX 템플릿을 그대로 옮긴 것. 카드마다 들어가는 칸이 정해져 있다.
+# theme 이 "review" 일 때만 이 스키마를 쓴다.
+
+SCHEMA_8 = """{
+  "theme": "review",
+  "palette": "<팔레트>",
+  "slides": [
+    {"no":1,"type":"cover","kind":"BOOK REVIEW",
+     "eyebrow":"<책을 한 줄로 소개하는 부제. 20~28자>",
+     "headline":"<책 제목 그대로. 길면 \\n 으로 두 줄>",
+     "author":"저자  <지은이>","rating":"<5점 만점 별점>","image_path":"card_images/cover.png"},
+
+    {"no":2,"type":"oneline","kind":"ONE LINE","headline":"이 책을 한 문장으로",
+     "line":"<이 책이 무슨 책인지 한 문장. \\n 으로 2~3줄로 끊는다. 줄당 8~12자>",
+     "subhead":"<그 문장을 받쳐주는 두 줄>",
+     "note":"<작은 상자에 들어갈 짧은 말 두 줄>"},
+
+    {"no":3,"type":"ideas","kind":"KEY IDEAS","headline":"핵심 주제",
+     "points":[{"k":"<주제 한 마디 8~12자>","v":"<한 문장 설명 25~35자>"},
+               {"k":"<주제>","v":"<설명>"},
+               {"k":"<주제>","v":"<설명>"}]},
+
+    {"no":4,"type":"insight","kind":"INSIGHT",
+     "headline":"<이 책에서 제일 눈에 띄는 대목. \\n 으로 두 줄>",
+     "body":"<그 대목을 풀어 쓴 두 줄>",
+     "callout":"<어두운 상자에 들어갈 문장. \\n 으로 세 줄. 줄당 10~14자>",
+     "close":"<마무리 두 줄>"},
+
+    {"no":5,"type":"quote","kind":"QUOTATION",
+     "line":"<책에서 뽑은 문장. \\n 으로 2~3줄. 원문 그대로>",
+     "who":"<지은이, 『책 제목』>",
+     "subhead":"<그 문장에 대한 두 줄>"},
+
+    {"no":6,"type":"afterword","kind":"MY REVIEW","headline":"<제목 한 줄>",
+     "body":"<두 줄>","body2":"<세 줄>",
+     "close":"<크게 들어갈 마무리. \\n 으로 두 줄. 줄당 8~12자>"},
+
+    {"no":7,"type":"foryou","kind":"FOR YOU","headline":"이런 분께 추천해요",
+     "points":[{"k":"<어떤 사람인지 앞 구절>","v":"<뒤 구절>"},
+               {"k":"<앞 구절>","v":"<뒤 구절>"},
+               {"k":"<앞 구절>","v":"<뒤 구절>"}]},
+
+    {"no":8,"type":"closing","kind":"CLOSING",
+     "eyebrow":"<마무리 인사 두 줄>",
+     "headline":"<읽는 사람에게 던지는 물음. \\n 으로 두 줄. 물음표로 끝>",
+     "rating":"<5점 만점 별점>",
+     "subhead":"<한 줄 안내>"}
+  ],
+  "caption": "<게시용 캡션. 4~6줄>",
+  "hashtags": ["#태그1","#태그2","#태그3","#태그4","#태그5"]
+}"""
+
+RULES_8 = """
+## 절대 규칙
+
+1. **숫자·사실은 주어진 책 데이터에서만.** 없는 수상·판매고·순위를 지어내면 허위 표시가 된다.
+2. **5번 인용은 원문 그대로.** 주어진 데이터(책 소개·출판사 리뷰·추천사·MD 한마디) 안에
+   실제로 있는 문장만 쓴다. 다듬거나 지어내면 안 된다. `who` 에 출처를 밝힌다.
+3. **책 본문을 길게 옮기지 않는다.** 한 문장까지다.
+4. **가격을 넣지 않는다.** 책 정보(ISBN·쪽수·판형)도 카드에 쓰지 않는다.
+5. **1번 headline 은 책 제목 그대로**다. 후크는 eyebrow(부제)에 쓴다.
+   부제는 제목을 되풀이하지 말고, 이 책이 무엇에 대한 책인지 한 줄로 알려준다.
+   ⭕ "조금 느려도 괜찮은 삶에 대하여" ❌ "베스트셀러 화제작" ← 아무 정보가 없다
+6. **줄 길이를 지켜라.** 이 템플릿은 칸이 정해져 있어 길면 넘친다.
+   · 2번 `line`, 4번 `callout`, 6번 `close`, 8번 `headline` — **줄당 8~14자**, `\\n` 으로 직접 끊는다
+   · 3번·7번 `k` 는 8~14자, `v` 는 25~35자 한 문장
+7. **카드마다 다른 얘기를 해라.** 3번에서 한 말을 4번에서 또 하지 마라.
+   3번은 이 책이 다루는 주제 세 가지, 4번은 그중 가장 인상적인 대목 하나를 깊이 판다.
+8. **뭉뚱그린 말을 쓰지 마라.**
+   ❌ "감동적인 이야기" ❌ "탄탄한 구성" ❌ "~에 대해 설명한다"
+   ⭕ 목차의 장 제목, 저자가 겪은 일, 책이 내놓는 구체적인 방법
+9. **6번이 유일하게 사람 목소리가 들어가는 자리다.**
+   앞 카드가 전부 사실과 인용이라, 여기가 없으면 안내문처럼 읽힌다.
+   책을 요약하지 말고 **읽고 나서 무엇이 달라지는지**를 써라.
+10. **8번은 물음으로 닫는다.** "만나보세요" 로 끝나면 거기서 대화가 끝난다.
+    책의 주제를 읽는 사람 자기 이야기로 끌어오는 물음이어야 한다. 물음표로 끝낸다.
+11. **JSON만 출력한다.** 설명·코드펜스 없이 `{` 로 시작해 `}` 로 끝낸다.
+"""
+
+
 ### 카드 성격 ############################################################
 # 같은 책이라도 **누가 올리느냐**에 따라 말이 달라져야 한다.
 #   review — 읽은 사람이 남에게 권한다 (개인 계정·파트너스)
@@ -316,12 +397,12 @@ def build_prompt(brief, reviews, persona_md, hooks_md, theme, palette,
 
 # 출력 형식
 theme 은 "{theme}", palette 는 "{palette}" 로 고정한다.
-{SCHEMA}
-{RULES}
+{SCHEMA_8 if theme == "review" else SCHEMA}
+{RULES_8 if theme == "review" else RULES}
 
 ## 이 성격에서 달라지는 것
-9번 — {m["s9"]}
-10번 — {m["s10"]}
+{"6번" if theme == "review" else "9번"} — {m["s9"]}
+{"8번" if theme == "review" else "10번"} — {m["s10"]}
 """
 
 
@@ -408,7 +489,64 @@ def hashtags(chips, book):
     return out[:3]
 
 
+def five_point(book):
+    """교보 평점은 10점 만점이다. 템플릿은 5점 만점이라 반으로 줄인다.
+
+    반올림하지 않고 내린다. 9.9 → 4.95 를 5.0 으로 올리면
+    만점을 받은 것처럼 보인다. 실제보다 좋게 적지 않는다.
+    """
+    v = book.get("평점")
+    try:
+        return "%.1f" % (int(float(v) / 2 * 10) / 10)
+    except (TypeError, ValueError):
+        return ""
+
+
+def sanitize_review(data, output_dir, book, palette):
+    """북리뷰 테마(8장) 정리. 칸이 정해진 템플릿이라 손볼 게 적다."""
+    output_dir = Path(output_dir)
+    data["theme"] = "review"
+    data["palette"] = palette
+    cover = "card_images/cover.png"
+    has_cover = (output_dir / cover).exists()
+    rating = five_point(book)
+
+    kinds = {"cover": "BOOK REVIEW", "oneline": "ONE LINE", "ideas": "KEY IDEAS",
+             "insight": "INSIGHT", "quote": "QUOTATION", "afterword": "MY REVIEW",
+             "foryou": "FOR YOU", "closing": "CLOSING"}
+
+    for i, sl in enumerate(data.get("slides", []), 1):
+        sl["no"] = i
+        sl["kind"] = kinds.get(sl.get("type"), sl.get("kind") or "")
+
+        if sl.get("type") == "cover":
+            sl["image_path"] = cover if has_cover else None
+            sl["book_title"] = book.get("제목") or sl.get("headline")
+            who = book.get("저자") or ""
+            if book.get("역자"):
+                who += " · 옮김 " + book["역자"]
+            sl["author"] = ("저자  " + who) if who else ""
+            sl["rating"] = rating
+        elif sl.get("type") == "closing":
+            sl["rating"] = rating
+        elif sl.get("type") == "quote":
+            # 인용은 원문에 있는 문장만. 지어낸 문장이면 출처를 지운다.
+            q = {"text": sl.get("line") or "", "who": sl.get("who") or "책"}
+            if not _real_quote(q, book):
+                sl["who"] = ""
+        elif sl.get("type") in ("ideas", "foryou"):
+            sl["points"] = [p for p in (sl.get("points") or []) if (p.get("k") or "").strip()][:3]
+
+    return data
+
+
 def sanitize(data, output_dir, book, theme, palette, disclosure=""):
+    if theme == "review":
+        return sanitize_review(data, output_dir, book, palette)
+    return sanitize_frost(data, output_dir, book, theme, palette, disclosure)
+
+
+def sanitize_frost(data, output_dir, book, theme, palette, disclosure=""):
     """없는 이미지 제거 + 숫자 바로잡기 + 표지 사진 채우기"""
     output_dir = Path(output_dir)
     data["theme"] = theme
@@ -485,6 +623,7 @@ def sanitize(data, output_dir, book, theme, palette, disclosure=""):
         fixed[-1]["chips"] = hashtags(fixed[-1].get("chips"), book)
 
     # 표지 색에 카드 색을 맞춘다. 금색 표지에 파란 배경이면 따로 논다.
+    # (북리뷰 테마는 팔레트 6개가 정해져 있으므로 건드리지 않는다)
     data["extra_css"] = book_theme.apply(output_dir)
     return data
 

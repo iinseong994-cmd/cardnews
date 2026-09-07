@@ -50,6 +50,7 @@ THEMES = {
     "simple": ("slide_simple.html", "styles_simple.css"),
     "bold": ("slide_bold.html", "styles_bold.css"),
     "frost": ("slide_frost.html", "styles_frost.css"),
+    "review": ("slide_review.html", "styles_review.css"),
 }
 
 
