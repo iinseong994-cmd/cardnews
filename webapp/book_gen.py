@@ -36,11 +36,8 @@ SCHEMA = """{
      "bullets":["<한 문장>","<한 문장>","<한 문장>","<한 문장>"],"subhead":"<마무리 한 줄>"},
     {"no":4,"type":"list","eyebrow":"<한 단어>","headline":"<제목 두 줄>",
      "bullets":["<한 문장>","<한 문장>","<한 문장>","<한 문장>"],"subhead":"<마무리 한 줄>"},
-    {"no":5,"type":"spec","headline":"책 정보",
-     "rows":[{"k":"지은이","v":"<값>"},{"k":"옮긴이","v":"<값>"},{"k":"펴낸곳","v":"<값>"},
-             {"k":"출간","v":"<값>"},{"k":"분량","v":"<값>"},{"k":"분야","v":"<값>"},
-             {"k":"ISBN","v":"<값>"}],
-     "chips":["<수상·판매고 뱃지>","<뱃지>"]},
+    {"no":5,"type":"list","eyebrow":"<한 단어>","headline":"<제목 두 줄>",
+     "bullets":["<한 문장>","<한 문장>","<한 문장>","<한 문장>"],"subhead":"<마무리 한 줄>"},
     {"no":6,"type":"quotes","headline":"<제목 두 줄>","image_path":null,
      "quotes":[{"text":"<추천사 원문 그대로>","who":"<추천한 사람·매체>"},
                {"text":"<추천사 원문 그대로>","who":"<추천한 사람·매체>"},
@@ -53,7 +50,8 @@ SCHEMA = """{
                {"text":"<독자 리뷰 원문 그대로>","who":"교보문고 구매자"}]},
     {"no":9,"type":"list","headline":"이런 분께\\n맞습니다",
      "bullets":["<대상1>","<대상2>","<대상3>","<이 책이 특히 맞는 상황 한 줄>"],"image_path":null},
-    {"no":10,"type":"cta","headline":"<마무리 두 줄>","chips":["<출판사>","<쪽수>","<분야>"],
+    {"no":10,"type":"cta","headline":"<마무리 두 줄>",
+     "chips":["#해시태그","#해시태그","#해시태그"],
      "subhead":"<고지문구가 필요하면 여기. 없으면 빈 문자열>"}
   ],
   "caption": "<게시용 캡션. 페르소나 말투. 4~6줄>",
@@ -80,14 +78,23 @@ RULES = """
    ⭕ "뼈가 / 30조각" (저자가 사고로 얼굴 뼈 30조각이 났다는 사실)
    ⭕ "6개월 / 만에" (걷지 못하던 사람이 6개월 만에 복귀했다)
    대형 문구는 **한 줄에 2~4자, 최대 2줄.** 길면 잘린다.
-7. **2·3·4번 카드는 서로 다른 각도여야 한다.**
+7. **2·3·4·5번 카드는 서로 다른 각도여야 한다.**
    고를 수 있는 각도: 이 책이 나온 배경 / 저자가 겪은 일 / 핵심 주장 /
-   책이 내놓는 방법 / 목차에서 보이는 흐름 / 이 책이 받은 평가 / 누가 왜 읽었나
-   `eyebrow` 에 그 각도를 한 단어로 적는다. (예: 시작, 핵심, 방법, 배경, 지은이)
+   책이 내놓는 방법 / 목차에서 보이는 흐름 / 이 책이 받은 평가 / 누가 왜 읽었나 /
+   이 책이 답하는 물음 / 책에 담긴 구체적인 것들
+   `eyebrow` 에 그 각도를 한 단어로 적는다. (예: 시작, 핵심, 방법, 배경, 지은이, 목차)
 
    **같은 사실을 두 카드에 넣지 마라.** 3번에 "부자가 되는 세 가지 방법" 을 썼으면
    4번에 또 쓰면 안 된다. 3번이 무엇을 다뤘는지 보고 4번은 다른 것을 골라라.
    쓸 각도가 모자라면 카드 수를 줄이지 말고 **목차를 더 파고들어** 다른 대목을 찾아라.
+
+   **5번은 목차를 쓰기 가장 좋은 자리다.** '이 책에 담긴 것' 으로 잡고
+   목차의 장 제목 네 개를 그대로 가져와라. 그 책만 쓸 수 있는 말이라 제일 힘이 있다.
+   목차가 없는 책이면 이 책이 답하는 물음 네 개나, 받은 평가(쇄수·번역국·판매고)를 쓴다.
+
+   **책 정보(ISBN·쪽수·판형·출판사)는 카드에 쓰지 않는다.**
+   읽는 사람이 궁금해하는 정보가 아니고, 열 장 중 한 장을 거기 쓰기엔 아깝다.
+   저자 이름은 4번(지은이) 카드에서만 다룬다.
 8. **bullets 에는 책 "안의 내용" 을 쓴다. 책 "에 대한 설명" 을 쓰지 마라.**
 
    제일 흔한 실패가 목차를 남의 말로 바꿔 적는 것이다. 이러면 아무 정보가 없다.
@@ -118,11 +125,17 @@ RULES = """
     (예: "이론을 더 알고 싶은 분보다, 오늘 당장 할 한 가지를 찾는 분께 맞습니다")
 12. **분량을 채운다.** 카드가 비어 보이면 안 된다.
     - `list` 의 bullets 는 **4개**, 각 한 문장 (25~45자)
-    - `spec` 의 rows 는 **6~7줄**. 데이터에 있는 항목을 최대한 담는다
     - `quotes` 는 **3개**
-    - `chips` — cover 3개, spec 2개, cta 2~3개
     - 모든 list 카드에 `subhead` 를 한 줄 넣는다
-13. **JSON만 출력한다.** 설명·코드펜스 없이 `{` 로 시작해 `}` 로 끝낸다.
+    - `chips` — cover 3개(수상·판매고 같은 자랑거리), cta 3개(해시태그)
+
+13. **마지막 카드의 chips 는 해시태그다.** `#` 을 붙여 3개 쓴다.
+    그대로 복사해 게시글에 붙일 수 있어야 하므로, 사람들이 실제로 검색하는 말을 쓴다.
+    책 데이터의 키워드·분야에서 가져오고, 붙여 쓴다(띄어쓰기 없이).
+    ⭕ `#책추천` `#자기계발` `#대화의기술` `#말하기` `#커뮤니케이션`
+    ❌ `#북플레저` (출판사 이름) ❌ `#328쪽` (쪽수) ❌ `#자기계발서적추천베스트`
+    출판사 이름·쪽수·판형은 해시태그로 쓰지 않는다. 아무도 그걸로 찾지 않는다.
+14. **JSON만 출력한다.** 설명·코드펜스 없이 `{` 로 시작해 `}` 로 끝낸다.
 """
 
 
@@ -308,6 +321,45 @@ def _real_quote(q, book):
     return any(p and p in hay for p in probes)
 
 
+def hashtags(chips, book):
+    """마지막 카드의 알약을 해시태그로 만든다.
+
+    출판사 이름·쪽수가 들어가 있으면 아무도 그걸로 찾지 않는다.
+    AI 가 안 붙였거나 엉뚱한 걸 넣었으면 책 데이터의 키워드·분야로 채운다.
+    """
+    out = []
+    for c in (chips or []):
+        c = str(c).strip()
+        if not c.startswith("#"):
+            continue
+        body = c[1:]
+        if not body or body.replace(",", "").isdigit() or "쪽" in body:
+            continue
+        if book.get("출판사") and book["출판사"].replace(" ", "") in body:
+            continue
+        if c not in out:
+            out.append(c)
+
+    if len(out) < 3:
+        # 책 제목이 제일 많이 검색되는 태그다. 그 다음이 리뷰에 많이 나온 말.
+        title = re.sub(r"\(.*?\)|\[.*?\]", "", book.get("제목") or "")
+        pool = [title] + list(book.get("ai키워드") or []) + list(book.get("키워드") or []) \
+            + list(reversed(book.get("분야") or [])) + ["책추천"]
+        junk = {"국내도서", "외국도서", "서양도서", "eBook", "오디오북", "전체"}
+        for w in pool:
+            w = re.sub(r"[^0-9A-Za-z가-힣]", "", str(w))
+            if not w or len(w) > 14 or w in junk:
+                continue
+            tag = "#" + w
+            # 앞 두 글자가 같으면 사실상 같은 태그다 (#경제전망 · #경제일반)
+            if any(t[1:3] == tag[1:3] for t in out):
+                continue
+            out.append(tag)
+            if len(out) >= 3:
+                break
+    return out[:3]
+
+
 def sanitize(data, output_dir, book, theme, palette, disclosure=""):
     """없는 이미지 제거 + 숫자 바로잡기 + 표지 사진 채우기"""
     output_dir = Path(output_dir)
@@ -325,15 +377,15 @@ def sanitize(data, output_dir, book, theme, palette, disclosure=""):
                 sl[field] = None
 
         if sl.get("type") == "cover" and not sl.get("cutout"):
-            if (output_dir / "card_images" / "cover.jpg").exists():
-                sl["image_path"] = "card_images/cover.jpg"
+            if (output_dir / "card_images" / "cover.png").exists():
+                sl["image_path"] = "card_images/cover.png"
 
         if sl.get("type") == "photo":
-            # 사진 카드의 사진 칸과 표지 칸은 비율이 다르다.
-            # cover.jpg(세로 940×1536)를 사진 카드에 넣으면 위아래가 잘려 제목이 날아간다.
-            if (output_dir / "card_images" / "wide.jpg").exists():
-                sl["image_path"] = "card_images/wide.jpg"
-            elif sl.get("image_path", "").endswith("cover.jpg"):
+            # 표지 칸과 사진 칸은 비율이 다르다.
+            # 표지용 세로 그림을 사진 카드에 넣으면 위아래가 잘려 제목이 날아간다.
+            if (output_dir / "card_images" / "wide.png").exists():
+                sl["image_path"] = "card_images/wide.png"
+            elif (sl.get("image_path") or "").endswith("cover.png"):
                 sl["image_path"] = None
             if not sl.get("image_path"):
                 sl["type"] = "list"            # 사진이 없으면 글자 카드로
@@ -380,6 +432,7 @@ def sanitize(data, output_dir, book, theme, palette, disclosure=""):
     data["slides"] = fixed
     if fixed and fixed[-1].get("type") == "cta":
         fixed[-1]["subhead"] = disclosure or fixed[-1].get("subhead") or ""
+        fixed[-1]["chips"] = hashtags(fixed[-1].get("chips"), book)
 
     # 표지 색에 카드 색을 맞춘다. 금색 표지에 파란 배경이면 따로 논다.
     data["extra_css"] = book_theme.apply(output_dir)

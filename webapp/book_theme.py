@@ -44,11 +44,22 @@ def dominant_hue(path, boxes=8):
     return best[1], min(0.9, max(0.35, best[2]))
 
 
+# 표지 이미지는 투명 PNG 다. 잘라 채우지 말고 통째로 보여야 하고,
+# 액자처럼 보이는 모서리·그림자도 없어야 한다 (그림자는 PNG 에 그려져 있다).
+CUTOUT_CSS = """/* 책 표지는 배경 없이 그림만 */
+.slide--cover .coverphoto, .slide--photo .bleed {
+  background-size: contain; background-repeat: no-repeat; background-position: center;
+  background-color: transparent;
+  box-shadow: none; border-radius: 0;
+}
+"""
+
+
 def build_css(cover_path):
-    """표지 → 색만 바꾸는 CSS. 무채색 표지면 빈 문자열(테마 기본색 유지)."""
+    """표지 → 카드 CSS. 무채색 표지면 색은 그대로 두고 모양만 잡는다."""
     got = dominant_hue(cover_path)
     if not got:
-        return ""
+        return CUTOUT_CSS
     h, s = got
 
     ink = _hex(h, min(0.42, s * 0.6), 0.17)      # 본문 진한 색
@@ -65,7 +76,8 @@ def build_css(cover_path):
     mega1 = _hex(h, s, 0.56)                     # 표지 큰 글씨 그라데이션
     mega2 = _hex(h, min(0.95, s * 1.05), 0.33)
 
-    return f"""/* 표지 색에서 뽑은 팔레트 */
+    return CUTOUT_CSS + f"""
+/* 표지 색에서 뽑은 팔레트 */
 :root, body {{
   --ink: {ink}; --ink-2: {ink2}; --line: {line};
   --chip-bg: #FFFFFF; --chip-ink: {chip};

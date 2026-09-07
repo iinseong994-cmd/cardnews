@@ -49,38 +49,45 @@ def _fit(img, box, margin=MARGIN):
                       Image.LANCZOS)
 
 
-def _shadow(canvas, box_xy, size, blur=26, alpha=78):
-    """표지 아래 그림자. 배경에 뜨지 않고 얹힌 느낌을 준다."""
+def _shadow(canvas, box_xy, size, blur=30, alpha=72):
+    """표지 아래 그림자. 투명 캔버스 위에 직접 그린다."""
     x, y = box_xy
     w, h = size
     layer = Image.new("L", canvas.size, 0)
-    layer.paste(255, (x, y + 10, x + w, y + h + 14))
+    layer.paste(255, (x + 6, y + 14, x + w - 6, y + h + 18))
     layer = layer.filter(ImageFilter.GaussianBlur(blur))
-    dark = Image.new("RGB", canvas.size, (10, 22, 34))
-    canvas.paste(dark, (0, 0), layer.point(lambda v: int(v * alpha / 255)))
+    layer = layer.point(lambda v: int(v * alpha / 255))
+    dark = Image.new("RGBA", canvas.size, (14, 20, 28, 0))
+    dark.putalpha(layer)
+    canvas.alpha_composite(dark)
 
 
 def _compose(cover, box, margin=MARGIN, center_y=0.5):
-    """center_y — 표지를 칸의 위/아래 어디에 놓을지 (0.5 면 한가운데).
-    전면 컷은 아래에 글자 띠가 깔리므로 조금 위로 올린다."""
-    canvas = _backdrop(cover, box).convert("RGB")
-    fit = _fit(cover, box, margin)
+    """표지 뒤에 아무것도 깔지 않는다.
+
+    흐린 배경을 깔면 카드 안에 액자가 하나 더 생긴 것처럼 보인다.
+    투명하게 두면 카드 바탕(테마 색)이 그대로 비쳐서 훨씬 깔끔하다.
+    그림자는 CSS 로 못 주니 여기서 그려 넣는다.
+    """
+    canvas = Image.new("RGBA", box, (0, 0, 0, 0))
+    fit = _fit(cover, box, margin).convert("RGBA")
     x = (box[0] - fit.width) // 2
     y = int((box[1] - fit.height) * center_y)
     _shadow(canvas, (x, y), fit.size)
-    canvas.paste(fit, (x, y))
+    canvas.alpha_composite(fit, (x, y))
     return canvas
 
 
 # 이름 → (칸 크기, 표지가 차지할 비율, 세로 위치)
+# 투명 배경이 필요하므로 PNG 다.
 VARIANTS = {
-    "cover.jpg": (COVER_BOX, 0.86, 0.50),
-    "wide.jpg":  (WIDE_BOX,  0.84, 0.50),
+    "cover.png": (COVER_BOX, 0.90, 0.50),
+    "wide.png":  (WIDE_BOX,  0.86, 0.50),
 }
 
 
 def build_book_images(output_dir):
-    """output_dir/cover.jpg → output_dir/card_images/*.jpg. 만든 파일 경로 목록 반환."""
+    """output_dir/cover.jpg → output_dir/card_images/*.png. 만든 파일 경로 목록 반환."""
     out = Path(output_dir)
     src = out / "cover.jpg"
     if not src.exists():
@@ -88,12 +95,15 @@ def build_book_images(output_dir):
 
     dest = out / "card_images"
     dest.mkdir(exist_ok=True)
+    # 예전 방식(흐린 배경 깔린 jpg)이 남아 있으면 AI 가 그걸 골라 쓴다
+    for old in ("cover.jpg", "wide.jpg"):
+        (dest / old).unlink(missing_ok=True)
 
     cover = Image.open(src).convert("RGB")
     made = []
     for name, (box, margin, cy) in VARIANTS.items():
         p = dest / name
-        _compose(cover, box, margin, cy).save(p, "JPEG", quality=92)
+        _compose(cover, box, margin, cy).save(p, "PNG")
         made.append(p)
     return made
 
