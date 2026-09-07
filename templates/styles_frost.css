@@ -86,16 +86,17 @@ mark { background: none; color: var(--accent); }
 /* ── 표지 ── */
 .slide--cover .mega {
   position: absolute; left: 84px; top: 196px; width: 500px;
-  font-size: 152px; font-weight: 900; line-height: 1.02;
+  /* 크기는 템플릿이 줄 수·줄 길이를 재서 --mega-size 로 넘겨준다.
+     디자인 다듬기에서 제목 크기를 만지면 그 값이 이걸 덮어쓴다. */
+  font-size: var(--mega-size, 152px); font-weight: 900; line-height: 1.02;
   letter-spacing: -.045em;
   background: linear-gradient(180deg, #4FA9E4 0%, #1567A8 100%);
   -webkit-background-clip: text; background-clip: text;
   -webkit-text-fill-color: transparent;
   filter: drop-shadow(0 6px 0 rgba(255,255,255,.92)) drop-shadow(0 14px 26px rgba(16,52,79,.18));
 }
-/* 줄이 늘어나면 글자를 줄여 아래 설명과 겹치지 않게 */
-.slide--cover .mega--3 { font-size: 102px; }
-.slide--cover .mega--4 { font-size: 78px; }
+/* 줄 수에 따른 축소는 템플릿의 --mega-size 계산에 들어가 있다.
+   여기서 다시 font-size 를 쓰면 그 계산을 덮어써서 다시 넘치게 된다. */
 
 .slide--cover .mega mark {
   -webkit-text-fill-color: initial; color: var(--ink);

@@ -58,6 +58,10 @@ def render_html(template_env, data: dict, slide: dict, css_url: str) -> str:
     tpl_name = THEMES.get(theme, THEMES["default"])[0]
     template = template_env.get_template(tpl_name)
     cfg = data.get("design") or {}
+    # extra_css — slides.json 이 직접 들고 오는 CSS (책 표지에서 뽑은 색 등).
+    # 디자인 다듬기 값보다 **먼저** 붙여서, 사람이 조절한 값이 항상 이긴다.
+    extra = (data.get("extra_css") or "").strip()
+    built = design.build_css(theme, cfg)
     return template.render(
         slide=slide,
         total=len(data["slides"]),
@@ -65,7 +69,7 @@ def render_html(template_env, data: dict, slide: dict, css_url: str) -> str:
         brand=data.get("brand", ""),
         palette=data.get("palette", "ice"),
         label=cfg.get("label", ""),
-        design_css=design.build_css(theme, cfg),
+        design_css="\n".join(x for x in (extra, built) if x),
         css_path=css_url,
     )
 

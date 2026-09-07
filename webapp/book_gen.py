@@ -15,6 +15,7 @@ import re
 from pathlib import Path
 
 import gen
+import book_theme
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -348,6 +349,11 @@ def sanitize(data, output_dir, book, theme, palette, disclosure=""):
                 lines = lines[:1] + [" ".join(lines[1:])]
             sl["headline"] = "\n".join(lines)
 
+        # 값이 없는 줄은 빼야 한다. '옮긴이 [빈칸]' 이 남으면 안 만든 티가 난다
+        if sl.get("type") == "spec" and sl.get("rows"):
+            sl["rows"] = [r for r in sl["rows"]
+                          if str(r.get("v") or "").strip() not in ("", "-", "없음", "미상")]
+
         # 인용이 하나도 없는 quotes 카드는 빈 카드가 된다
         if sl.get("type") == "quotes" and not sl.get("quotes"):
             sl["type"] = "list"
@@ -374,6 +380,9 @@ def sanitize(data, output_dir, book, theme, palette, disclosure=""):
     data["slides"] = fixed
     if fixed and fixed[-1].get("type") == "cta":
         fixed[-1]["subhead"] = disclosure or fixed[-1].get("subhead") or ""
+
+    # 표지 색에 카드 색을 맞춘다. 금색 표지에 파란 배경이면 따로 논다.
+    data["extra_css"] = book_theme.apply(output_dir)
     return data
 
 

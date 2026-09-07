@@ -29,7 +29,17 @@
     {# ── 표지 ── #}
     {% if slide.type == "cover" %}
       {% if slide.eyebrow %}<div class="tag">{{ slide.eyebrow }}</div>{% endif %}
-      <h1 class="mega mega--{{ slide.headline.split('\n')|select|list|length }}">{{ rich(slide.headline) }}</h1>
+      {#- 표지 큰 글씨는 줄 수와 **줄 길이**를 둘 다 봐야 한다.
+          줄 수만 보고 크기를 정하면 '2027년 부' 같은 긴 줄이 칸(500px)을 넘어
+          옆의 표지 사진 위로 흘러넘친다. 둘 중 작은 쪽을 쓴다.
+          font-size 를 직접 쓰지 않고 변수로 넘기는 이유는
+          디자인 다듬기(제목 크기 조절)가 계속 먹게 하려는 것이다. -#}
+      {%- set _ls = slide.headline.split('\n')|select|list %}
+      {%- set _n = _ls|length %}
+      {%- set _w = (_ls|map('length')|max) if _ls else 1 %}
+      {%- set _byline = 152 if _n <= 2 else (102 if _n == 3 else 78) %}
+      {%- set _bywidth = (500 / ([_w, 1]|max * 0.95))|int %}
+      <h1 class="mega mega--{{ _n }}" style="--mega-size: {{ [_byline, _bywidth]|min }}px">{{ rich(slide.headline) }}</h1>
       {% if slide.subhead %}<p class="mega-sub">{{ slide.subhead }}</p>{% endif %}
       {% if slide.cutout %}
         <img class="cutout" src="{{ slide.cutout }}" alt="">
