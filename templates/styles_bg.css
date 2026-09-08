@@ -28,7 +28,11 @@ body {
 
 /* 글자 칸. font-size 는 스크립트가 정하고, 안쪽은 전부 em 으로 따라간다.
    그래야 칸이 작아도 비율이 무너지지 않는다. */
-.box { position: absolute; display: flex; align-items: center; color: var(--ink); }
+.box {
+  position: absolute; display: flex; align-items: center; color: var(--ink);
+  /* 한국어는 이게 없으면 '준비를 하 / 고' 처럼 어절 중간에서 끊긴다 */
+  word-break: keep-all; overflow-wrap: break-word;
+}
 .inner { width: 100%; }
 
 .kicker {

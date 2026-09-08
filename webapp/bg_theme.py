@@ -37,6 +37,26 @@ def themes():
     return json.loads(f.read_text(encoding="utf-8")) if f.exists() else []
 
 
+MIN_TEXT_W = 470        # 이보다 좁으면 어절 중간에서 끊긴다
+MIN_TEXT_H = 190
+MIN_COVER_W = 260       # 표지가 이보다 좁으면 우표만 해진다
+
+
+def pick_text_box(bs):
+    """글자를 넣을 칸을 고른다.
+
+    ⚠️ **제일 큰 칸이 늘 답은 아니다.** 세로로 길고 좁은 칸이 면적은 커도
+       거기에 글을 넣으면 '성공한 IT 기 / 업가에서 / 나홀로 아빠 / 로' 처럼
+       한 글자씩 끊긴다. 글이 들어갈 만한 너비부터 본다.
+    """
+    if not bs:
+        return None
+    ok = [b for b in bs if b["w"] >= MIN_TEXT_W and b["h"] >= MIN_TEXT_H]
+    if not ok:
+        ok = [b for b in bs if b["w"] >= MIN_TEXT_W]        # 납작해도 넓은 쪽이 낫다
+    return max(ok or bs, key=lambda b: b["w"] * b["h"])
+
+
 def split_stack(bs):
     """줄지어 선 '목록 칸' 을 골라낸다. → (머리 칸, [목록 칸들])
 
@@ -91,13 +111,13 @@ def apply(data, theme_id, cover=None):
         info = tbl.get(key) or {}
         bs = info.get("boxes") or []
         sl["mode"] = info.get("mode", "band")
-        sl["box"] = bs[0] if bs else None
+        sl["box"] = pick_text_box(bs)
 
         # 표지 카드 — 배경의 빈 책 자리에 진짜 표지를 얹는다.
         # 글자를 쓰는 것보다 이게 훨씬 자연스럽다.
         # 다만 **세로로 선 칸일 때만** 그렇다. 가로로 납작한 띠에 넣으면 책이 찌그러진다.
         if sl.get("no") == 1 and cover:
-            up = [b for b in bs if b["h"] > b["w"] * 1.1]
+            up = [b for b in bs if b["h"] > b["w"] * 1.1 and b["w"] >= MIN_COVER_W]
             if up:
                 sl["cover"] = str(cover)
                 sl["box"] = max(up, key=lambda b: b["w"] * b["h"])
