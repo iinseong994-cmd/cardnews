@@ -11,9 +11,18 @@ templates/backgrounds/ 의 배경 96장은 저마다 빈 칸 위치가 다르다
 ⚠️ 처음엔 다 실패했다. **종이 결과 그림자를 무늬로 오해**해서다.
    살짝 흐리게 만든 뒤 재야 잡힌다. 아래 GaussianBlur 를 빼면 안 된다.
 
-24장으로 시험했을 때 20장은 제자리를 잡았고 4장은 빗나갔다
-(창문을 빈 칸으로 보거나, 커튼 사이 좁은 틈을 잡는다).
-빗나간 것은 boxes.json 을 손으로 고친다.
+찾는 순서
+  1) 밝고 무늬 없는 곳 (흰 종이)                    → 90장
+  2) 없으면 밝기를 안 따지고 다시 (진한 남색 판)      →  2장
+  3) 그래도 없으면 반투명 띠를 깐다 (실루엣 콜라주)   →  4장
+
+3) 이 중요하다. 빈 칸이 아예 없는 배경이 있는데, 억지로 글자를 얹으면 안 읽힌다.
+띠를 깔면 어떤 배경이든 확실히 읽힌다.
+
+boxes.json 의 각 항목
+  x·y·w·h  글자 넣을 자리
+  dark     그 자리가 어두운가 (참이면 흰 글씨)
+  mode     "blank" 빈 칸에 바로 / "band" 반투명 띠를 깔고
 """
 
 import json
@@ -33,15 +42,22 @@ SW, SH = 216, 270          # 줄여서 계산 — 빠르고 잡티에 덜 흔들
 MIN_AREA = 0.06            # 카드의 6% 보다 작으면 못 찾은 것으로 본다
 
 
-def blank_mask(im):
-    """밝고 무늬 없는 곳 = 글자 놓을 수 있는 곳"""
-    g = (im.convert("L").resize((SW, SH), Image.LANCZOS)
-           .filter(ImageFilter.GaussianBlur(2.2)))
+def small(im):
+    return (im.convert("L").resize((SW, SH), Image.LANCZOS)
+              .filter(ImageFilter.GaussianBlur(2.2)))
+
+
+def blank_mask(g, bright_only=True):
+    """무늬 없는 곳 = 글자 놓을 수 있는 곳.
+
+    bright_only=True 면 밝은 곳만 (흰 종이).
+    False 면 밝기를 안 따진다 — **진한 남색 판 위에 흰 글씨**를 얹는 배경이 있다.
+    그런 배경은 밝은 곳만 찾으면 아무것도 못 찾는다.
+    """
     edge = g.filter(ImageFilter.FIND_EDGES).filter(ImageFilter.MaxFilter(3))
-    lum = ImageStat.Stat(g).mean[0]
-    th = max(118, lum * 0.98)
+    th = max(118, ImageStat.Stat(g).mean[0] * 0.98)
     pg, pe = g.load(), edge.load()
-    return [[1 if (pg[x, y] >= th and pe[x, y] <= 7) else 0
+    return [[1 if (pe[x, y] <= 7 and (not bright_only or pg[x, y] >= th)) else 0
              for x in range(SW)] for y in range(SH)]
 
 
@@ -66,12 +82,33 @@ def largest_rect(m):
 
 
 def find(path):
+    """빈 칸을 찾는다. 없으면 반투명 띠를 깔 자리를 돌려준다.
+
+    빈 칸이 없는 배경이 있다 (실루엣 콜라주 같은 것).
+    그런 배경에 억지로 글자를 얹으면 안 읽힌다.
+    그래서 못 찾으면 mode="band" 로 표시하고, 렌더할 때 반투명 띠를 깔고 그 위에 쓴다.
+    이러면 96장 전부 확실히 읽힌다.
+    """
     im = Image.open(path)
-    area, x, y, w, h = largest_rect(blank_mask(im))
+    g = small(im)
+    area, x, y, w, h = largest_rect(blank_mask(g, True))
+    if area / (SW * SH) < MIN_AREA:
+        # 밝은 빈칸이 없는 배경이다. 밝기를 안 따지고 다시 찾는다.
+        area, x, y, w, h = largest_rect(blank_mask(g, False))
+
+    fill = area / (SW * SH)
     fx, fy = CARD_W / SW, CARD_H / SH
+
+    if fill < MIN_AREA:
+        # 글자 놓을 데가 없다 → 아래쪽에 반투명 띠
+        return {"x": 90, "y": 810, "w": CARD_W - 180, "h": 400,
+                "fill": round(fill, 3), "dark": True, "mode": "band"}
+
+    lum = ImageStat.Stat(g.crop((x, y, x + max(w, 1), y + max(h, 1)))).mean[0]
     return {"x": round(x * fx), "y": round(y * fy),
             "w": round(w * fx), "h": round(h * fy),
-            "fill": round(area / (SW * SH), 3)}
+            "fill": round(fill, 3),
+            "dark": lum < 120, "mode": "blank"}
 
 
 def main():
@@ -83,12 +120,12 @@ def main():
             key = "%s/%s" % (d.name, f.stem)
             box = find(f)
             out[key] = box
-            if box["fill"] < MIN_AREA:
+            if box["mode"] == "band":
                 weak.append(key)
     OUT.write_text(json.dumps(out, ensure_ascii=False, indent=1), encoding="utf-8")
     print("  %d장 → %s" % (len(out), OUT))
     if weak:
-        print("  손봐야 할 것 %d장: %s" % (len(weak), ", ".join(weak)))
+        print("  빈 칸이 없어 반투명 띠를 쓸 것 %d장: %s" % (len(weak), ", ".join(weak)))
 
     if check:
         keys = list(out)
@@ -103,7 +140,7 @@ def main():
             b = out[k]
             ImageDraw.Draw(im).rectangle(
                 [b["x"], b["y"], b["x"] + b["w"], b["y"] + b["h"]],
-                outline=(255, 60, 0), width=10)
+                outline=(0, 200, 255) if out[k].get("dark") else (255, 60, 0), width=10)
             sheet.paste(im.resize((W, H), Image.LANCZOS),
                         (8 + (i % cols) * (W + 8), 8 + (i // cols) * (H + 8)))
         p = BG / "boxes_check.png"

@@ -49,6 +49,14 @@ THEMES = [
 
 PREVIEW_W, PREVIEW_H = 360, 450
 
+# 원본 PPT 안에서 파일이 잘려 있는 그림.
+# 아래쪽 데이터가 아예 없어서 복구가 안 된다 (회색으로 나온다).
+# 같은 테마의 다른 장을 **좌우로 뒤집어** 쓴다. 그냥 복사하면 같은 배경이 두 번 나온다.
+#   "테마/번호": 대신 쓸 번호
+REPLACE_BROKEN = {
+    "arch/04": 2,
+}
+
 
 def slide_images(pptx):
     """슬라이드 순서대로 media 파일 이름을 돌려준다.
@@ -108,6 +116,20 @@ def main():
                     im = im.resize((1080, 1350), Image.LANCZOS)
                 im.save(d / ("%02d.jpg" % (k + 1)), "JPEG",
                         quality=86, optimize=True)
+            # 깨진 장을 같은 테마의 다른 장(좌우 반전)으로 대신한다
+            for k in range(PER_THEME):
+                key = "%s/%02d" % (tid, k + 1)
+                src = REPLACE_BROKEN.get(key)
+                if not src:
+                    continue
+                good = d / ("%02d.jpg" % src)
+                if good.exists():
+                    Image.open(good).transpose(Image.FLIP_LEFT_RIGHT) \
+                         .save(d / ("%02d.jpg" % (k + 1)), "JPEG",
+                               quality=86, optimize=True)
+                    print("       %s ← %02d번을 좌우 반전 (원본이 깨져 있음)"
+                          % (key, src))
+
             cover = Image.open(d / "01.jpg")
             cover.resize((PREVIEW_W, PREVIEW_H), Image.LANCZOS) \
                  .save(PREV / ("bg_%s.png" % tid), "PNG")
