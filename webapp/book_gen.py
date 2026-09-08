@@ -16,6 +16,7 @@ from pathlib import Path
 
 import gen
 import book_theme
+import bg_theme
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -171,6 +172,63 @@ RULES = """
     ❌ `#북플레저` (출판사 이름) ❌ `#328쪽` (쪽수) ❌ `#자기계발서적추천베스트`
     출판사 이름·쪽수·판형은 해시태그로 쓰지 않는다. 아무도 그걸로 찾지 않는다.
 14. **JSON만 출력한다.** 설명·코드펜스 없이 `{` 로 시작해 `}` 로 끝낸다.
+"""
+
+
+### 배경 사진 테마 — 10장 ###################################################
+# 사진 위 빈 칸에 글자를 얹는다. 칸이 좁아서 **짧게** 써야 한다.
+# 칸 자리와 배경은 webapp/bg_theme.py 가 붙인다.
+
+SCHEMA_BG = """{
+  "theme": "bg",
+  "palette": "<배경 테마>",
+  "slides": [
+    {"no":1,"kicker":"BOOK REVIEW","headline":"<책 제목 그대로>",
+     "note":"<지은이 · 펴낸곳 · 쪽수>"},
+    {"no":2,"kicker":"한 문장으로","headline":"<이 책이 무슨 책인지 한 문장. \\\\n 으로 두 줄>",
+     "note":"<받쳐주는 한 줄. 45자 안쪽>"},
+    {"no":3,"kicker":"이 책이 하는 말","headline":"<제목 두 줄>",
+     "lines":["<한 줄 25~35자>","<한 줄>","<한 줄>"]},
+    {"no":4,"kicker":"책의 한 문장","headline":"<책에서 뽑은 문장. \\\\n 으로 2~3줄. 원문 그대로>",
+     "note":"— 『<책 제목>』 중에서"},
+    {"no":5,"kicker":"지은이","headline":"<지은이를 한 마디로. 두 줄>",
+     "lines":["<한 줄>","<한 줄>","<한 줄>"]},
+    {"no":6,"kicker":"<한 단어>","headline":"<제목 두 줄>",
+     "lines":["<한 줄>","<한 줄>","<한 줄>"]},
+    {"no":7,"kicker":"이런 분께","headline":"이런 분께\\\\n권합니다",
+     "lines":["<어떤 사람인지 한 줄>","<한 줄>","<한 줄>"]},
+    {"no":8,"kicker":"독자 리뷰","headline":"<독자 리뷰 원문. \\\\n 으로 2~3줄>",
+     "note":"<리뷰 수와 평점 한 줄>"},
+    {"no":9,"kicker":"<한 단어>","headline":"<제목 두 줄>",
+     "lines":["<한 줄>","<한 줄>","<한 줄>"]},
+    {"no":10,"kicker":"CLOSING","headline":"<읽는 사람에게 던지는 물음. 두 줄. 물음표로 끝>",
+     "note":"<한 줄 안내>"}
+  ],
+  "caption": "<게시용 캡션. 4~6줄>",
+  "hashtags": ["#태그1","#태그2","#태그3","#태그4","#태그5"]
+}"""
+
+RULES_BG = """
+## 절대 규칙
+
+1. **짧게 써라.** 사진 위 빈 칸에 얹는 카드라 자리가 좁다. 길면 글자가 깨알이 된다.
+   · `headline` — 줄당 **10~16자**, `\\\\n` 으로 직접 끊는다. 최대 3줄
+   · `lines` — 한 줄 **25~35자**, 세 줄
+   · `note` — **45자 안쪽** 한 줄
+   길이를 넘기면 카드가 망가진다. 다른 규칙보다 이게 먼저다.
+2. **숫자·사실은 주어진 책 데이터에서만.** 없는 수상·판매고를 지어내면 허위 표시가 된다.
+3. **4번과 8번은 원문 그대로 인용한다.** 다듬거나 지어내면 안 된다.
+   · 4번 — 책 소개·출판사 리뷰·MD 한마디 안에 실제로 있는 문장
+   · 8번 — 독자 리뷰 하나. note 에 리뷰 수와 평점
+4. **1번 headline 은 책 제목 그대로**다.
+5. **책 정보(ISBN·판형)와 가격은 쓰지 않는다.**
+6. **6번은 이 책이 받은 평가·화제성**을 쓴다 (수상·미디어 소개·판매고).
+   자료가 없으면 목차에서 이 책이 다루는 것을 뽑아 쓴다.
+7. **9번이 유일하게 사람 목소리가 들어가는 자리다.**
+   책을 요약하지 말고 읽고 나서 무엇이 달라지는지를 써라.
+8. **10번은 물음으로 닫는다.** 물음표로 끝낸다.
+9. **카드마다 다른 얘기를 해라.** 3번에서 한 말을 6번에서 또 하지 마라.
+10. **JSON만 출력한다.** 설명·코드펜스 없이 `{` 로 시작해 `}` 로 끝낸다.
 """
 
 
@@ -410,8 +468,8 @@ def build_prompt(brief, reviews, persona_md, hooks_md, theme, palette,
 
 # 출력 형식
 theme 은 "{theme}", palette 는 "{palette}" 로 고정한다.
-{SCHEMA_10 if theme == "review" else SCHEMA}
-{RULES_10 if theme == "review" else RULES}
+{SCHEMA_BG if theme == "bg" else SCHEMA_10 if theme == "review" else SCHEMA}
+{RULES_BG if theme == "bg" else RULES_10 if theme == "review" else RULES}
 
 ## 이 성격에서 달라지는 것
 9번 — {m["s9"]}
@@ -557,7 +615,29 @@ def sanitize_review(data, output_dir, book, palette):
     return data
 
 
+def sanitize_bg(data, output_dir, book, palette):
+    """배경 사진 테마 정리. 배경과 글자 칸은 bg_theme 가 붙인다."""
+    output_dir = Path(output_dir)
+    data["theme"] = "bg"
+    data["palette"] = palette
+    rating = book.get("평점")
+
+    for i, sl in enumerate(data.get("slides", []), 1):
+        sl["no"] = i
+        sl["lines"] = [l for l in (sl.get("lines") or []) if str(l).strip()][:3]
+        # 독자 리뷰 장의 리뷰 수·평점은 AI 를 믿지 않고 크롤 데이터로 적는다
+        if i == 8 and book.get("리뷰수"):
+            sl["note"] = "교보문고 리뷰 %s개 · 평점 %s / 10" % (
+                format(book["리뷰수"], ","), rating or "-")
+
+    cover = output_dir / "cover.jpg"
+    bg_theme.apply(data, palette or "forest", cover=cover if cover.exists() else None)
+    return data
+
+
 def sanitize(data, output_dir, book, theme, palette, disclosure=""):
+    if theme == "bg":
+        return sanitize_bg(data, output_dir, book, palette)
     if theme == "review":
         return sanitize_review(data, output_dir, book, palette)
     return sanitize_frost(data, output_dir, book, theme, palette, disclosure)

@@ -41,6 +41,7 @@ import review as reviewer  # noqa: E402
 import update as updater  # noqa: E402
 import book_gen  # noqa: E402
 import book_images  # noqa: E402
+import bg_theme  # noqa: E402
 
 
 # 교보문고 링크 / ISBN 이면 책 흐름으로 간다. 쿠팡 흐름은 그대로 둔다.
@@ -80,7 +81,16 @@ SETUP_ERROR = setup_problem()
 JOBS = {}
 JOBS_LOCK = threading.Lock()
 
+def bg_palettes():
+    """배경 사진 테마 12종 — templates/backgrounds/themes.json 에서 읽는다."""
+    return [{"id": t["id"], "name": t["name"], "desc": t.get("desc", ""),
+             "preview": t.get("preview")} for t in bg_theme.themes()]
+
+
 THEMES = [
+    # 사진 위에 글자를 얹는다. 배경 12종은 받은 PPTX 에서 뽑아 왔다.
+    {"id": "bg", "name": "사진 배경", "desc": "실사 배경 위에 글자 · 책 전용",
+     "palettes": bg_palettes()},
     # 책 전용 — 8장 구성. 팔레트 6개는 받은 PPTX 템플릿에서 그대로 옮겼다.
     {"id": "review", "name": "북리뷰", "desc": "편집 잡지풍 8장 구성 · 책 전용",
      # preview 가 있으면 화면이 이름 대신 실제로 그려본 카드를 보여준다.
