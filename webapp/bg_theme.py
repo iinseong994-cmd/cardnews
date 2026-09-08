@@ -37,13 +37,80 @@ def themes():
     return json.loads(f.read_text(encoding="utf-8")) if f.exists() else []
 
 
-def apply(data, theme_id):
-    """slides 각 장에 배경 그림과 글자 칸을 붙인다."""
-    b = boxes()
+def split_stack(bs):
+    """줄지어 선 '목록 칸' 을 골라낸다. → (머리 칸, [목록 칸들])
+
+    잡지형 배경은 비슷한 너비의 상자가 세로로 줄지어 있다 (metro·pop·citymap).
+    그런 배경은 칸마다 한 줄씩 넣어야 한다. 한 칸에 몰아넣으면 깨알이 된다.
+
+    ⚠️ 맨 위 제목 칸은 **너비가 다르다**. 전부를 한 묶음으로 보고 너비를 재면
+       판정이 실패한다 (metro/03 은 900 vs 495 라서 목록이 아니라고 나왔었다).
+       그래서 흔한 너비를 기준으로 목록 칸을 먼저 고르고, 나머지를 머리로 본다.
+    """
+    if len(bs) < 3:
+        return None, []
+    ws = sorted(b["w"] for b in bs)
+    mid = ws[len(ws) // 2]
+    body = [b for b in bs if 0.75 <= b["w"] / mid <= 1.33]
+    if len(body) < 3:
+        return None, []
+
+    # 높이도 비슷해야 목록이다.
+    # ⚠️ 이게 없으면 **종이 한 장을 쪼갠 것**을 목록으로 오해한다.
+    #    (forest/03 은 230·110·200 처럼 들쭉날쭉한데 너비만 보면 통과해 버린다)
+    hs = [b["h"] for b in body]
+    if min(hs) / max(hs) < 0.6:
+        return None, []
+
+    body.sort(key=lambda b: b["y"])
+    for a, c in zip(body, body[1:]):       # 위아래로 안 겹쳐야 한다
+        if c["y"] < a["y"] + a["h"] * 0.6:
+            return None, []
+
+    # 머리 칸은 목록 **위에** 있는 것을 먼저 쓴다 (제목이 위에 와야 읽힌다).
+    # 위에 없으면 남은 칸 중 제일 큰 것을 쓴다. 제목을 버리는 것보다는 낫다.
+    rest = [b for b in bs if b not in body]
+    above = [b for b in rest if b["y"] + b["h"] <= body[0]["y"] + 40]
+    head = (min(above, key=lambda b: b["y"]) if above
+            else max(rest, key=lambda b: b["w"] * b["h"]) if rest else None)
+    return head, body
+
+
+def apply(data, theme_id, cover=None):
+    """slides 각 장에 배경 그림과 글자 칸을 붙인다.
+
+    cover — 책 표지 그림 경로. 1번 카드의 빈 책에 그대로 얹는다.
+    """
+    tbl = boxes()
     for sl in data.get("slides", []):
         n = CARD_BG.get(sl.get("no"), 1)
         key = "%s/%02d" % (theme_id, n)
         img = BG / theme_id / ("%02d.jpg" % n)
         sl["image_path"] = str(img) if img.exists() else None
-        sl["box"] = b.get(key)
+
+        info = tbl.get(key) or {}
+        bs = info.get("boxes") or []
+        sl["mode"] = info.get("mode", "band")
+        sl["box"] = bs[0] if bs else None
+
+        # 표지 카드 — 배경의 빈 책 자리에 진짜 표지를 얹는다.
+        # 글자를 쓰는 것보다 이게 훨씬 자연스럽다.
+        # 다만 **세로로 선 칸일 때만** 그렇다. 가로로 납작한 띠에 넣으면 책이 찌그러진다.
+        if sl.get("no") == 1 and cover:
+            up = [b for b in bs if b["h"] > b["w"] * 1.1]
+            if up:
+                sl["cover"] = str(cover)
+                sl["box"] = max(up, key=lambda b: b["w"] * b["h"])
+                continue
+
+        # 목록 카드 — 칸이 줄지어 있으면 한 칸에 한 줄씩
+        if sl.get("lines"):
+            head, body = split_stack(bs)
+            # 머리 칸이 따로 없는데 칸이 남으면 맨 위 칸을 제목 자리로 쓴다
+            if head is None and len(body) > len(sl["lines"]):
+                head, body = body[0], body[1:]
+            if body:
+                sl["head_box"] = head
+                sl["slots"] = [{"box": b, "text": t}
+                               for b, t in zip(body, sl["lines"])]
     return data

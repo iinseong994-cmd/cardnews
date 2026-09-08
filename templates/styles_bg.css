@@ -66,3 +66,17 @@ mark { background: none; color: inherit; text-decoration: underline;
   background: rgba(14, 17, 22, .46);
   font-size: 20px; font-weight: 600; color: #FFF; letter-spacing: .01em;
 }
+
+/* 표지 카드 — 배경의 빈 책 자리에 진짜 표지를 얹는다.
+   글자를 쓰는 것보다 이게 자연스럽다. 종이 결이 비치게 살짝 섞는다. */
+.cover {
+  position: absolute; object-fit: contain;   /* 비율을 지킨다. cover 로 채우면 책이 찌그러진다 */
+  box-shadow: 0 14px 34px rgba(0,0,0,.30);
+  mix-blend-mode: multiply;
+}
+
+/* 잡지형 배경의 줄지어 선 칸 — 한 칸에 한 줄 */
+.slot { align-items: center; }
+.slot .one {
+  font-size: .5em; font-weight: 700; line-height: 1.45; letter-spacing: -.02em;
+}

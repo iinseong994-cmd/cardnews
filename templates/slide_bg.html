@@ -25,7 +25,8 @@
     {%- endfor -%}
   {%- endmacro %}
 
-  {% set b = slide.box or {'x':90,'y':810,'w':900,'h':400,'dark':true,'mode':'band'} %}
+  {% set b = slide.box or {'x':90,'y':810,'w':900,'h':400,'dark':true} %}
+  {% macro at(z) %}left:{{ z.x }}px; top:{{ z.y }}px; width:{{ z.w }}px; height:{{ z.h }}px;{% endmacro %}
 
   <div class="slide {% if b.dark %}on-dark{% endif %}">
     {% if slide.image_path %}
@@ -33,24 +34,45 @@
     {% endif %}
 
     {# 빈 칸이 없는 배경은 반투명 띠를 깔고 그 위에 쓴다 #}
-    {% if b.mode == 'band' %}
+    {% if slide.mode == 'band' %}
       <div class="band" style="left:{{ b.x - 40 }}px; top:{{ b.y - 40 }}px;
                                width:{{ b.w + 80 }}px; height:{{ b.h + 80 }}px;"></div>
     {% endif %}
 
-    <div class="box" data-fit
-         style="left:{{ b.x }}px; top:{{ b.y }}px; width:{{ b.w }}px; height:{{ b.h }}px;">
-      <div class="inner">
-        {% if slide.kicker %}<p class="kicker">{{ slide.kicker }}</p>{% endif %}
-        {% if slide.headline %}<h1 class="head">{{ rich(slide.headline) }}</h1>{% endif %}
-        {% if slide.lines %}
-          <ul class="lines">
-            {% for l in slide.lines %}<li>{{ rich(l) }}</li>{% endfor %}
-          </ul>
-        {% endif %}
-        {% if slide.note %}<p class="note">{{ rich(slide.note) }}</p>{% endif %}
+    {% if slide.cover %}
+      {# 표지 카드 — 배경의 빈 책 자리에 진짜 표지를 얹는다 #}
+      <img class="cover" src="{{ slide.cover }}" alt="" style="{{ at(b) }}">
+
+    {% elif slide.slots %}
+      {# 칸이 줄지어 있는 잡지형 배경 — 한 칸에 한 줄씩 #}
+      {% if slide.head_box %}
+        <div class="box" data-fit style="{{ at(slide.head_box) }}">
+          <div class="inner">
+            {% if slide.kicker %}<p class="kicker">{{ slide.kicker }}</p>{% endif %}
+            {% if slide.headline %}<h1 class="head">{{ rich(slide.headline) }}</h1>{% endif %}
+          </div>
+        </div>
+      {% endif %}
+      {% for s in slide.slots %}
+        <div class="box slot {% if s.box.dark %}on-dark{% endif %}" data-fit style="{{ at(s.box) }}">
+          <div class="inner"><p class="one">{{ rich(s.text) }}</p></div>
+        </div>
+      {% endfor %}
+
+    {% else %}
+      <div class="box" data-fit style="{{ at(b) }}">
+        <div class="inner">
+          {% if slide.kicker %}<p class="kicker">{{ slide.kicker }}</p>{% endif %}
+          {% if slide.headline %}<h1 class="head">{{ rich(slide.headline) }}</h1>{% endif %}
+          {% if slide.lines %}
+            <ul class="lines">
+              {% for l in slide.lines %}<li>{{ rich(l) }}</li>{% endfor %}
+            </ul>
+          {% endif %}
+          {% if slide.note %}<p class="note">{{ rich(slide.note) }}</p>{% endif %}
+        </div>
       </div>
-    </div>
+    {% endif %}
 
     {% if label %}<div class="label">{{ label }}</div>{% endif %}
   </div>

@@ -81,34 +81,53 @@ def largest_rect(m):
     return best
 
 
-def find(path):
-    """빈 칸을 찾는다. 없으면 반투명 띠를 깔 자리를 돌려준다.
+MIN_SLOT = 0.012        # 칸 하나가 카드의 1.2% 는 돼야 글자가 들어간다
+MAX_SLOTS = 5
 
-    빈 칸이 없는 배경이 있다 (실루엣 콜라주 같은 것).
-    그런 배경에 억지로 글자를 얹으면 안 읽힌다.
-    그래서 못 찾으면 mode="band" 로 표시하고, 렌더할 때 반투명 띠를 깔고 그 위에 쓴다.
-    이러면 96장 전부 확실히 읽힌다.
+
+def all_rects(g, mask):
+    """빈 칸을 큰 것부터 여러 개 찾는다.
+
+    **제일 큰 칸 하나만 찾으면 안 된다.** 흰 상자가 3~4개 놓인 잡지형 배경이 있는데,
+    거기에 글을 다 몰아넣으면 작은 칸은 깨알이 되고 큰 칸은 텅 빈다.
+    하나 찾을 때마다 그 자리를 지우고 다시 찾는다.
     """
+    out = []
+    for _ in range(MAX_SLOTS):
+        area, x, y, w, h = largest_rect(mask)
+        if area / (SW * SH) < MIN_SLOT:
+            break
+        # 너무 가늘거나 납작한 것은 글자가 안 들어간다
+        if w >= 24 and h >= 12 and max(w / h, h / w) <= 9:
+            lum = ImageStat.Stat(g.crop((x, y, x + w, y + h))).mean[0]
+            out.append({"x": x, "y": y, "w": w, "h": h, "dark": lum < 120})
+        for yy in range(y, y + h):
+            for xx in range(x, x + w):
+                mask[yy][xx] = 0
+    return out
+
+
+def find(path):
+    """빈 칸들을 찾는다. 하나도 없으면 반투명 띠를 깔 자리를 돌려준다."""
     im = Image.open(path)
     g = small(im)
-    area, x, y, w, h = largest_rect(blank_mask(g, True))
-    if area / (SW * SH) < MIN_AREA:
+    rects = all_rects(g, blank_mask(g, True))
+    if not rects:
         # 밝은 빈칸이 없는 배경이다. 밝기를 안 따지고 다시 찾는다.
-        area, x, y, w, h = largest_rect(blank_mask(g, False))
+        rects = all_rects(g, blank_mask(g, False))
 
-    fill = area / (SW * SH)
     fx, fy = CARD_W / SW, CARD_H / SH
-
-    if fill < MIN_AREA:
+    if not rects:
         # 글자 놓을 데가 없다 → 아래쪽에 반투명 띠
-        return {"x": 90, "y": 810, "w": CARD_W - 180, "h": 400,
-                "fill": round(fill, 3), "dark": True, "mode": "band"}
+        return {"mode": "band", "boxes": [
+            {"x": 90, "y": 810, "w": CARD_W - 180, "h": 400, "dark": True}]}
 
-    lum = ImageStat.Stat(g.crop((x, y, x + max(w, 1), y + max(h, 1)))).mean[0]
-    return {"x": round(x * fx), "y": round(y * fy),
-            "w": round(w * fx), "h": round(h * fy),
-            "fill": round(fill, 3),
-            "dark": lum < 120, "mode": "blank"}
+    # 위에서 아래로 읽는 순서대로 (사람이 보는 순서)
+    rects.sort(key=lambda r: (r["y"], r["x"]))
+    boxes = [{"x": round(r["x"] * fx), "y": round(r["y"] * fy),
+              "w": round(r["w"] * fx), "h": round(r["h"] * fy),
+              "dark": r["dark"]} for r in rects]
+    return {"mode": "blank", "boxes": boxes}
 
 
 def main():
@@ -132,10 +151,8 @@ def main():
         contact(out, list(out), BG / "boxes_check.png", cols=8)
 
         # 의심스러운 것만 모아 크게 — 칸이 너무 작거나 지나치게 길쭉한 것
-        odd = [k for k, b in out.items()
-               if b["mode"] == "band" or b["fill"] < 0.11
-               or b["w"] < 240 or b["h"] < 200
-               or b["w"] / max(b["h"], 1) > 3 or b["h"] / max(b["w"], 1) > 3.4]
+        odd = [k for k, v in out.items()
+               if v["mode"] == "band" or len(v["boxes"]) >= 3]
         if odd:
             contact(out, odd, BG / "boxes_odd.png", cols=6, big=True)
             print("  수상한 것 %d장 → %s" % (len(odd), BG / "boxes_odd.png"))
@@ -152,16 +169,18 @@ def contact(out, keys, path, cols=8, big=False):
     for i, k in enumerate(keys):
         t, n = k.split("/")
         im = Image.open(BG / t / (n + ".jpg")).copy()
-        b = out[k]
-        ImageDraw.Draw(im).rectangle(
-            [b["x"], b["y"], b["x"] + b["w"], b["y"] + b["h"]],
-            outline=(0, 200, 255) if b.get("dark") else (255, 60, 0), width=10)
+        dr = ImageDraw.Draw(im)
+        for j, b in enumerate(out[k]["boxes"]):
+            dr.rectangle([b["x"], b["y"], b["x"] + b["w"], b["y"] + b["h"]],
+                         outline=(0, 200, 255) if b.get("dark") else (255, 60, 0),
+                         width=10)
+            dr.text((b["x"] + 16, b["y"] + 10), str(j + 1), fill=(255, 60, 0))
         x = pad + (i % cols) * (W + pad)
         y = pad + (i // cols) * (H + lab + pad)
         sheet.paste(im.resize((W, H), Image.LANCZOS), (x, y))
-        tag = "%s %s" % (t, n)
-        if b["mode"] == "band":
-            tag += "  (띠)"
+        tag = "%s %s  칸%d" % (t, n, len(out[k]["boxes"]))
+        if out[k]["mode"] == "band":
+            tag += " (띠)"
         d.text((x + 2, y + H + 5), tag, fill=(30, 36, 44))
     sheet.save(path)
     print("  확인용 그림 → %s" % path)
