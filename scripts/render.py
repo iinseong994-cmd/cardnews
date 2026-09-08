@@ -51,6 +51,7 @@ THEMES = {
     "bold": ("slide_bold.html", "styles_bold.css"),
     "frost": ("slide_frost.html", "styles_frost.css"),
     "review": ("slide_review.html", "styles_review.css"),
+    "bg": ("slide_bg.html", "styles_bg.css"),
 }
 
 

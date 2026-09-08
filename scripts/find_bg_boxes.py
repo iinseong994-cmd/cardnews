@@ -128,24 +128,43 @@ def main():
         print("  빈 칸이 없어 반투명 띠를 쓸 것 %d장: %s" % (len(weak), ", ".join(weak)))
 
     if check:
-        keys = list(out)
-        cols = 8
-        rows = (len(keys) + cols - 1) // cols
-        W, H = 150, 188
-        sheet = Image.new("RGB", (W * cols + 8 * (cols + 1),
-                                  H * rows + 8 * (rows + 1)), (238, 240, 244))
-        for i, k in enumerate(keys):
-            t, n = k.split("/")
-            im = Image.open(BG / t / (n + ".jpg")).copy()
-            b = out[k]
-            ImageDraw.Draw(im).rectangle(
-                [b["x"], b["y"], b["x"] + b["w"], b["y"] + b["h"]],
-                outline=(0, 200, 255) if out[k].get("dark") else (255, 60, 0), width=10)
-            sheet.paste(im.resize((W, H), Image.LANCZOS),
-                        (8 + (i % cols) * (W + 8), 8 + (i // cols) * (H + 8)))
-        p = BG / "boxes_check.png"
-        sheet.save(p)
-        print("  확인용 그림 → %s" % p)
+        # 이상한 게 있으면 사용자가 짚어줘야 한다. 그러려면 **이름이 보여야** 한다.
+        contact(out, list(out), BG / "boxes_check.png", cols=8)
+
+        # 의심스러운 것만 모아 크게 — 칸이 너무 작거나 지나치게 길쭉한 것
+        odd = [k for k, b in out.items()
+               if b["mode"] == "band" or b["fill"] < 0.11
+               or b["w"] < 240 or b["h"] < 200
+               or b["w"] / max(b["h"], 1) > 3 or b["h"] / max(b["w"], 1) > 3.4]
+        if odd:
+            contact(out, odd, BG / "boxes_odd.png", cols=6, big=True)
+            print("  수상한 것 %d장 → %s" % (len(odd), BG / "boxes_odd.png"))
+
+
+def contact(out, keys, path, cols=8, big=False):
+    """찾은 칸을 그려서 한 장에 모은다. 칸마다 이름을 적는다."""
+    W, H = (280, 350) if big else (150, 188)
+    pad, lab = 8, 22
+    rows = (len(keys) + cols - 1) // cols
+    sheet = Image.new("RGB", (W * cols + pad * (cols + 1),
+                              (H + lab) * rows + pad * (rows + 1)), (238, 240, 244))
+    d = ImageDraw.Draw(sheet)
+    for i, k in enumerate(keys):
+        t, n = k.split("/")
+        im = Image.open(BG / t / (n + ".jpg")).copy()
+        b = out[k]
+        ImageDraw.Draw(im).rectangle(
+            [b["x"], b["y"], b["x"] + b["w"], b["y"] + b["h"]],
+            outline=(0, 200, 255) if b.get("dark") else (255, 60, 0), width=10)
+        x = pad + (i % cols) * (W + pad)
+        y = pad + (i // cols) * (H + lab + pad)
+        sheet.paste(im.resize((W, H), Image.LANCZOS), (x, y))
+        tag = "%s %s" % (t, n)
+        if b["mode"] == "band":
+            tag += "  (띠)"
+        d.text((x + 2, y + H + 5), tag, fill=(30, 36, 44))
+    sheet.save(path)
+    print("  확인용 그림 → %s" % path)
 
 
 if __name__ == "__main__":

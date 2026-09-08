@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ko">
+{# ── 배경 사진 테마 ────────────────────────────────────────────────────────
+   사진 한 장을 통째로 깔고, 그 위 **빈 칸 안에만** 글자를 넣는다.
+   빈 칸의 자리는 배경마다 다르다 (templates/backgrounds/boxes.json).
+   그래서 좌표를 CSS 에 못 박지 않고 슬라이드 데이터에서 받아 인라인으로 쓴다.
+
+   글자 크기는 아래 스크립트가 **칸에 맞을 때까지 줄여서** 정한다.
+   칸이 작은 배경이 있어서 한 크기로 박으면 넘치거나 휑해진다. #}
+<head>
+  <meta charset="UTF-8">
+  <title>{{ slide.headline }}</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+  <link rel="stylesheet" href="{{ css_path }}">
+  {% if design_css %}<style>{{ design_css }}</style>{% endif %}
+</head>
+<body>
+  {% macro rich(text) -%}
+    {%- for line in (text or '').split('\n') -%}
+      {%- set parts = line.split('**') -%}
+      {%- for p in parts -%}
+        {%- if loop.index0 % 2 == 1 -%}<mark>{{ p }}</mark>{%- else -%}{{ p }}{%- endif -%}
+      {%- endfor -%}
+      {%- if not loop.last %}<br>{% endif -%}
+    {%- endfor -%}
+  {%- endmacro %}
+
+  {% set b = slide.box or {'x':90,'y':810,'w':900,'h':400,'dark':true,'mode':'band'} %}
+
+  <div class="slide {% if b.dark %}on-dark{% endif %}">
+    {% if slide.image_path %}
+      <img class="bg" src="{{ slide.image_path }}" alt="">
+    {% endif %}
+
+    {# 빈 칸이 없는 배경은 반투명 띠를 깔고 그 위에 쓴다 #}
+    {% if b.mode == 'band' %}
+      <div class="band" style="left:{{ b.x - 40 }}px; top:{{ b.y - 40 }}px;
+                               width:{{ b.w + 80 }}px; height:{{ b.h + 80 }}px;"></div>
+    {% endif %}
+
+    <div class="box" data-fit
+         style="left:{{ b.x }}px; top:{{ b.y }}px; width:{{ b.w }}px; height:{{ b.h }}px;">
+      <div class="inner">
+        {% if slide.kicker %}<p class="kicker">{{ slide.kicker }}</p>{% endif %}
+        {% if slide.headline %}<h1 class="head">{{ rich(slide.headline) }}</h1>{% endif %}
+        {% if slide.lines %}
+          <ul class="lines">
+            {% for l in slide.lines %}<li>{{ rich(l) }}</li>{% endfor %}
+          </ul>
+        {% endif %}
+        {% if slide.note %}<p class="note">{{ rich(slide.note) }}</p>{% endif %}
+      </div>
+    </div>
+
+    {% if label %}<div class="label">{{ label }}</div>{% endif %}
+  </div>
+
+  <script>
+    // 칸 안에 들어갈 때까지 글자를 줄인다.
+    // 칸 크기가 배경마다 달라서 한 크기로 박으면 넘치거나 휑해진다.
+    for (const box of document.querySelectorAll('[data-fit]')) {
+      const inner = box.firstElementChild;
+      let size = 64;                       // 넉넉히 크게 시작해서 줄여 내려온다
+      box.style.fontSize = size + 'px';
+      while (size > 15 &&
+             (inner.scrollHeight > box.clientHeight ||
+              inner.scrollWidth  > box.clientWidth)) {
+        size -= 1;
+        box.style.fontSize = size + 'px';
+      }
+      // 너무 작게 줄어들면 글이 칸에 비해 긴 것이다. 렌더 로그로 알 수 있게 남긴다.
+      box.dataset.fitted = size;
+    }
+  </script>
+</body>
+</html>
